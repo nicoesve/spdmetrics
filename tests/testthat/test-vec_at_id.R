@@ -1,5 +1,6 @@
 test_that("returns the right shape and class", {
-    load("data/test_data.RData")
+    # load("data/test_data.RData")
+    data("test_pd_mats")
     test_pd_mats[[1]] |> Matrix::unpack() |> Matrix::symmpart() |> Matrix::pack() |> 
     vec_at_id() |> (\(x) c(length(x), inherits(x, what = c("vector", "numeric"))))() |> 
     all() |> expect_true()

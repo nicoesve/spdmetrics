@@ -1,6 +1,8 @@
 test_that("computation of tangent images works", {
-    load("data/test_data.RData")
-    load("data/airm.RData")
+    # load("data/test_data.RData")
+    # load("data/airm.RData")
+	data("test_pd_mats")
+	data("airm")
     s <- CSample$new(conns = test_pd_mats, geom = airm)
 	s$compute_tangents() 
 	s$tangent_images |> (\(x) list(x |> is.null() |> expect_false(),
@@ -16,8 +18,10 @@ test_that("computation of tangent images works", {
 })
 
 test_that("computation of vectorized images works", {
-	load("data/test_data.RData")
-    load("data/airm.RData")
+	# load("data/test_data.RData")
+    # load("data/airm.RData")
+	data("test_pd_mats")
+	data("airm")
     s <- CSample$new(conns = test_pd_mats, geom = airm)
 	s$compute_tangents() 
 	s$compute_vecs()
@@ -34,8 +38,10 @@ test_that("computation of vectorized images works", {
 })
 
 test_that("inverse of vectorization works", {
-	load("data/test_data.RData")
-    load("data/airm.RData")
+	# load("data/test_data.RData")
+    # load("data/airm.RData")
+	data("test_pd_mats")
+	data("airm")
     s <- CSample$new(conns = test_pd_mats, geom = airm)
 	s$compute_tangents() 
 	old_tan <- s$tangent_images
@@ -45,8 +51,10 @@ test_that("inverse of vectorization works", {
 })	    	     
 
 test_that("changing reference points works", {
-    load("data/test_data.RData")
-    load("data/airm.RData")
+    # load("data/test_data.RData")
+    # load("data/airm.RData")
+	data("test_pd_mats")
+	data("airm")
     s <- CSample$new(conns = test_pd_mats, geom = airm)
     s$compute_tangents()
     new_ref <- 2*diag(10) |> Matrix::nearPD() |> _$mat |> Matrix::pack()
@@ -60,8 +68,10 @@ test_that("changing reference points works", {
 })
 
 test_that("computation of frechet mean works", {
-    load("data/test_data.RData")
-    load("data/airm.RData")
+    # load("data/test_data.RData")
+    # load("data/airm.RData")
+	data("test_pd_mats")
+	data("airm")
     s <- CSample$new(conns = test_pd_mats, geom = airm) 
 	s$compute_fmean() |> suppressWarnings()
 	s$frechet_mean |> (\(m) list(
@@ -72,8 +82,10 @@ test_that("computation of frechet mean works", {
 })
 
 test_that("centering works", {
-	load("data/test_data.RData")
-    load("data/airm.RData")
+	# load("data/test_data.RData")
+    # load("data/airm.RData")
+	data("test_pd_mats")
+	data("airm")
     s <- CSample$new(conns = test_pd_mats, geom = airm)
 	s$center() |> expect_error()
 	s$compute_tangents(); s$center()
@@ -84,8 +96,10 @@ test_that("centering works", {
 })
 
 test_that("computing variation works", {
-	load("data/test_data.RData")
-    load("data/airm.RData")
+	# load("data/test_data.RData")
+    # load("data/airm.RData")
+	data("test_pd_mats")
+	data("airm")
     s <- CSample$new(conns = test_pd_mats, geom = airm)
 	s$compute_variation() 
 	s$variation |> (\(x) list(
@@ -96,8 +110,10 @@ test_that("computing variation works", {
 })
 
 test_that("computing sample covariance works", {
-	load("data/test_data.RData")
-    load("data/airm.RData")
+	# load("data/test_data.RData")
+    # load("data/airm.RData")
+	data("test_pd_mats")
+	data("airm")
     s <- CSample$new(conns = test_pd_mats, geom = airm)
 	s$compute_sample_cov()
 	s$sample_cov |> (\(x) list(

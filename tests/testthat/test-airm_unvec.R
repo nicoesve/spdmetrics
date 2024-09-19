@@ -1,5 +1,6 @@
 test_that("Method returns right length and class", {
-    load("data/test_data.RData")
+    # load("data/test_data.RData")
+    data("test_pd_mats")
     Lambda <- test_pd_mats |> 
 	(\(l) list(l[[1]], l[[2]] |> Matrix::unpack() |> 
 	    methods::as(object=_, "dsyMatrix") |> Matrix::pack()))() |>
@@ -10,7 +11,8 @@ test_that("Method returns right length and class", {
 })
 
 test_that("arguments are correctly validated", {
-    load("data/test_data.RData")
+    # load("data/test_data.RData")
+    data("test_pd_mats")
     Sigma2 <- matrix(1:100, ncol = 10)
     w2 <- 1:55
     Lambda2 <- Matrix::Matrix(rep(1, 4), nrow = 2) |> Matrix::symmpart() |> 

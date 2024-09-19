@@ -1,12 +1,14 @@
 test_that("Method returns right length and class", {
-    load("data/test_data.RData")
+    # load("data/test_data.RData")
+    data("test_pd_mats")
     w <- test_pd_mats |> do.call(airm_vec, args = _)
     w |> inherits(x = _, what=c("vector", "numeric")) |> expect_true()
     w |> length() |> expect_equal(object=_, 55)
 })
 
 test_that("arguments are correctly validated", {
-    load("data/test_data.RData")
+    # load("data/test_data.RData")
+    data("test_pd_mats")
     Sigma2 <- matrix(1:100, ncol = 10)
     Lambda2 <- Matrix::Matrix(rep(1, 4), nrow = 2) |> Matrix::symmpart() |> 
 	Matrix::pack()
@@ -16,7 +18,8 @@ test_that("arguments are correctly validated", {
 })
 
 test_that("returns reasonable values in simple cases", {
-    load("data/test_data.RData")
+    # load("data/test_data.RData")
+    data("test_pd_mats")
     list(list(diag(10) |> Matrix::nearPD() |> _$mat |> Matrix::pack(), 
 	    test_pd_mats[[1]] |> Matrix::unpack() |> 
 		methods::as(object=_, Class="dsyMatrix") |> Matrix::pack()) |> 
@@ -28,7 +31,8 @@ test_that("returns reasonable values in simple cases", {
 })
 
 test_that("vec and unvec are mutual inverses", {
-    load("data/test_data.RData")
+    # load("data/test_data.RData")
+    data("test_pd_mats")
     list(test_pd_mats[[1]], 
 	test_pd_mats[[2]] |> Matrix::unpack() |> 
 	    methods::as(object =_, Class="dsyMatrix") |> Matrix::pack()) |> 

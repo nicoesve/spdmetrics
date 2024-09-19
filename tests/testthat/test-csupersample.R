@@ -1,6 +1,8 @@
 test_that("initalization works", {
-    load("data/test_data.RData")
-    load("data/airm.RData")
+    # load("data/test_data.RData")
+    # load("data/airm.RData")
+    data("test_pd_mats")
+    data("airm")
     s <- test_pd_mats |> CSample$new(geom = airm) 
     ss <- s |> (\(x) list(x,x))() |> CSuperSample$new()
     ss$list_of_samples |> expect_identical(list(s,s))
@@ -13,8 +15,10 @@ test_that("initalization works", {
 })
 
 test_that("gathering works", {
-    load("data/test_data.RData")
-    load("data/airm.RData")
+    # load("data/test_data.RData")
+    # load("data/airm.RData")
+    data("test_pd_mats")
+    data("airm")
     s <- test_pd_mats |> CSample$new(geom = airm) 
     ss <- s |> (\(x) list(x,x))() |> CSuperSample$new()
     ss$gather()
@@ -23,7 +27,8 @@ test_that("gathering works", {
 })
 
 test_that("computing simple statistics", {
-    load("data/test_data.RData"); load("data/airm.RData")
+    # load("data/test_data.RData"); load("data/airm.RData")
+    data("test_pd_mats"); data("airm")
     sam1 <- test_pd_mats |> purrr::map(\(x) 2*x) |> CSample$new(geom = airm)
     sam2 <- test_pd_mats |> CSample$new(geom = airm)
     ss <- list(sam1, sam2) |> CSuperSample$new() 
@@ -37,7 +42,8 @@ test_that("computing simple statistics", {
 })
 
 test_that("computation of advanced statistics works", {
-    load("data/test_data.RData"); load("data/airm.RData")
+    # load("data/test_data.RData"); load("data/airm.RData")
+    data("test_pd_mats"); data("airm")
     sam1 <- test_pd_mats |> purrr::map(\(x) 2*x) |> CSample$new(geom = airm)
     sam2 <- test_pd_mats |> CSample$new(geom = airm)
     ss <- list(sam1, sam2) |> CSuperSample$new() 

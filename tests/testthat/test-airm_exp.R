@@ -1,12 +1,14 @@
 test_that("Returns the right shape and class", {
-    load("data/test_data.RData")
+    # load("data/test_data.RData")
+    data("test_pd_mats")
     result <- do.call(airm_exp, args = test_pd_mats)
     expect_equal(result@Dim, c(10,10)) 
     inherits(result, "dppMatrix") |> expect_true()
 })
 
 test_that("Returns expected results when the reference point is the identity", {
-    load("data/test_data.RData")
+    # load("data/test_data.RData")
+    data("test_pd_mats")
     Sigma <- diag(10) |> methods::as(object =_, Class ="dpoMatrix") |> Matrix::pack()
     Lambda <- test_pd_mats[[1]]; comp <- expm::expm(Lambda)
     result <- airm_exp(Sigma, Lambda); 
