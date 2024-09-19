@@ -1,0 +1,13 @@
+# Export functions from airm_utils.R
+export(airm_log)
+export(airm_exp)
+export(airm_vec)
+export(airm_unvec)
+
+# Export specific functions from other_utils.R
+export(geometry)
+export(rpsdnorm)
+
+# Export R6 classes from sample.R and supersample.R
+exportClasses(CSample)
+exportClasses(CSuperSample)
