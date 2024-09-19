@@ -3,11 +3,12 @@ export(airm_log)
 export(airm_exp)
 export(airm_vec)
 export(airm_unvec)
+export(vec_at_id)
 
 # Export specific functions from other_utils.R
 export(geometry)
-export(rpsdnorm)
+export(rspdnorm)
 
 # Export R6 classes from sample.R and supersample.R
-exportClasses(CSample)
-exportClasses(CSuperSample)
+export(CSample)
+export(CSuperSample)

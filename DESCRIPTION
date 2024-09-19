@@ -11,5 +11,13 @@ LazyData: true
 Imports: 
     R6,
     purrr,
-    Matrix
+    Matrix,
+    MASS, 
+    expm,
+    furrr,
+    methods
+Depends: 
+    R (>= 3.5.0)
+Suggests:
+    testthat
 RoxygenNote: 7.1.1
