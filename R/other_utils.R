@@ -37,20 +37,20 @@ rspdnorm <- function(n, refpt, disp, met) {
 
 #' Relocate Tangent Representations to a New Reference Point
 #'
-#' Changes the reference point for tangent space representations.
+#' Changes the reference point for tangent space representations on a Riemannian manifold.
 #'
-#' @param old_ref The old reference point on the manifold.
-#' @param new_ref The new reference point on the manifold.
+#' @param old_ref A reference point on the manifold to be replaced. Must be an object of class `dppMatrix` from the Matrix package.
+#' @param new_ref The new reference point on the manifold. Must be an object of class `dppMatrix` from the Matrix package.
+#' @param images A list of tangent representations relative to the old reference point. Each element in the list must be an object of class `dspMatrix`.
+#' @param met A metric object of class `rmetric`, containing functions for Riemannian operations (logarithmic map, exponential map, vectorization, and inverse vectorization).
 #'
-#' @param images A list of tangent representations relative to the old reference point.
-#' @param met A metric object of class `rmetric`.
-#'
-#' @return A list of tangent representations relative to the new reference point.
+#' @return A list of tangent representations relative to the new reference point. Each element in the returned list will be an object of class `dspMatrix`.
 #' @export
 relocate <- function(old_ref, new_ref, images, met) {
     images |> furrr::future_map(
         \(tan) met$exp(old_ref, tan) |> met$log(Sigma = new_ref, Lambda = _)
     )
 }
+
 
 
