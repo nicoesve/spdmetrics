@@ -3,17 +3,19 @@ CSample <- R6::R6Class(
     private = list(
         conns = NULL, tan_imgs = NULL, vec_imgs = NULL, 
         n = NULL, p = NULL, d = NULL, centered = NULL, 
-        f_mean = NULL, metric = NULL, var = NULL, s_cov = NULL
+        f_mean = NULL, metric = NULL, var = NULL, s_cov = NULL,
+        tangent_handler = NULL  # Added field for TangentImageHandler
     ),
     public = list(
         initialize = function(conns = NULL, tan_imgs = NULL, 
                               vec_imgs = NULL, centered = NULL, metric) {
             if (is.null(metric)) stop("metric must be specified.")
+            private$metric <- metric
+            private$tangent_handler <- TangentImageHandler$new(metric)  # Initialize TangentImageHandler
 
             if (!is.null(conns)) {
                 if (!is.null(tan_imgs) || !is.null(vec_imgs)) {
-                    stop("When initializing, if conns is not NULL, 
-                          tan_imgs and vec_imgs must be NULL.")
+                    stop("When initializing, if conns is not NULL, tan_imgs and vec_imgs must be NULL.")
                 }
 
                 if (!is.null(centered)) { 
@@ -28,7 +30,7 @@ CSample <- R6::R6Class(
                 private$conns <- conns; private$tan_imgs <- NULL
                 private$vec_imgs <- NULL; private$n <- n; private$p <- p
                 private$d <- d; private$centered <- NULL; private$f_mean <- NULL
-                private$metric <- metric; private$var <- NULL; private$s_cov <- NULL
+                private$var <- NULL; private$s_cov <- NULL
 
             } else if (!is.null(tan_imgs)) {
                 if (!is.null(vec_imgs)) {
@@ -54,8 +56,8 @@ CSample <- R6::R6Class(
                 frechet_mean <- if (centered) tan_imgs[[1]] else NULL
                 private$conns <- NULL; private$tan_imgs <- tan_imgs; private$vec_imgs <- NULL
                 private$n <- n; private$p <- p; private$d <- d; private$centered <- centered
-                private$f_mean <- frechet_mean; private$metric <- metric; private$var <- NULL
-                private$s_cov <- NULL
+                private$f_mean <- frechet_mean; private$var <- NULL; private$s_cov <- NULL
+                private$tangent_handler$set_tangent_images(tan_imgs[[1]], tan_imgs[[2]])  # Set tangent images directly
             } else {
                 if (is.null(vec_imgs)) {
                     stop("At least one of conns, tan_imgs, or vec_imgs must be specified.")
@@ -83,8 +85,7 @@ CSample <- R6::R6Class(
                 private$conns <- NULL; private$tan_imgs <- NULL
                 private$vec_imgs <- vec_imgs; private$n <- n; private$p <- p
                 private$d <- d; private$centered <- centered; 
-                private$f_mean <- frechet_mean; private$metric <- metric; 
-                private$var <- NULL; private$s_cov <- NULL
+                private$f_mean <- frechet_mean; private$var <- NULL; private$s_cov <- NULL
             }
         },
         compute_tangents = function(
@@ -94,9 +95,9 @@ CSample <- R6::R6Class(
                 stop("ref_pt must be a dppMatrix object.")
             }
             if (is.null(private$conns)) stop("conns must be specified.")
-            private$tan_imgs <- private$conns |> 
-                purrr::map(\(conn) private$metric$log(ref_pt, conn)) |>
-                (\(x) list(ref_pt, x))()
+            private$tangent_handler$set_reference_point(ref_pt)  # Set reference point
+            private$tangent_handler$compute_tangents(private$conns)  # Compute tangents
+            private$tan_imgs <- list(ref_pt, private$tangent_handler$tangent_images)
         },
         compute_conns = function() {
             if (is.null(private$tan_imgs)) stop("tan_imgs must be specified.")
@@ -140,17 +141,17 @@ CSample <- R6::R6Class(
 
                 tan_step <- lr * Reduce(`+`, old_tan[[2]]) / 
                     aux_sample$sample_size
-                new_ref_pt <- self$metric$exp(old_ref_pt, tan_step)
+                new_ref_pt <- private$metric$exp(old_ref_pt, tan_step)
 
                 delta <- Matrix::norm(new_ref_pt - old_ref_pt, "F") / 
                         Matrix::norm(old_ref_pt, "F")
 
                 new_tan_imgs <- relocate(old_ref_pt, new_ref_pt, old_tan[[2]], 
-                    self$metric) 
+                    private$metric) 
 
                 aux_sample <- CSample$new(
                     tan_imgs = list(new_ref_pt, new_tan_imgs),
-                    centered = FALSE, metric = self$metric)
+                    centered = FALSE, metric = private$metric)
             }
             private$f_mean <- aux_sample$tangent_images[[1]]
         },
@@ -161,9 +162,8 @@ CSample <- R6::R6Class(
             if (!inherits(new_ref_pt, "dppMatrix")) { 
                 stop("new_ref_pt must be a dppMatrix object.")
             }
-            new_tan_imgs <- relocate(private$tan_imgs[[1]], new_ref_pt, 
-                private$tan_imgs[[2]], self$metric)
-            private$tan_imgs <- list(new_ref_pt, new_tan_imgs)
+            private$tangent_handler$relocate_tangents(new_ref_pt)  # Relocate tangents
+            private$tan_imgs <- list(new_ref_pt, private$tangent_handler$tangent_images)
         },
         center = function() {
             if (is.null(private$tan_imgs)) stop("tan_imgs must be specified.")
