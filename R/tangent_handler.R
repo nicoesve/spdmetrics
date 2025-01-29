@@ -32,6 +32,18 @@ TangentImageHandler <- R6::R6Class(
             private$tangent_images <- manifold_points |> 
                 purrr::map(\(point) private$metric$log(private$reference_point, point))
         },
+
+        compute_vecs = function() {
+            self$tangent_images |> 
+                purrr::map(\(tan) metric$vec(self$reference_point, tan)) |> 
+                do.call(rbind, args = _) |> (\(x) list(self$reference_point, x))()
+        },
+
+        compute_conns = function() {
+            if (is.null(private$tangent_images)) stop("tangent images must be specified.")
+            private$tangent_images |> 
+                purrr::map(\(tan) private$metric$exp(private$reference_point, tan))
+        },
         
         set_tangent_images = function(reference_point, tangent_images) {
             if (!inherits(reference_point, "dppMatrix")) {

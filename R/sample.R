@@ -101,14 +101,11 @@ CSample <- R6::R6Class(
         },
         compute_conns = function() {
             if (is.null(private$tangent_handler$tangent_images)) stop("tangent images must be specified.")
-            private$conns <- private$tangent_handler$tangent_images |> 
-                purrr::map(\(tan) private$metric$exp(private$tangent_handler$reference_point, tan))
+            private$conns <- private$tangent_handler$compute_conns()
         },
         compute_vecs = function() {
             if (is.null(private$tangent_handler$tangent_images)) stop("tangent images must be specified.")
-            private$vec_imgs <- private$tangent_handler$tangent_images |> 
-                purrr::map(\(tan) private$metric$vec(private$tangent_handler$reference_point, tan)) |> 
-                do.call(rbind, args = _) |> (\(x) list(private$tangent_handler$reference_point, x))()
+            private$vec_imgs <- private$tangent_handler$compute_vecs()
         },
         compute_unvecs = function() {
             if (is.null(private$vec_imgs)) stop("vec_imgs must be specified.")
@@ -139,7 +136,7 @@ CSample <- R6::R6Class(
         },
         compute_variation = function() {
             if (self$vector_images |> is.null()) {
-                if (self$tangent_handler$tangent_images |> is.null()) { 
+                if (private$tangent_handler$tangent_images |> is.null()) { 
                     self$compute_tangents()
                 } 
                 self$compute_vecs()
@@ -154,7 +151,7 @@ CSample <- R6::R6Class(
         },
         compute_sample_cov = function() {
             if (self$vector_images |> is.null()) {
-                if (self$tangent_handler$tangent_images |> is.null()) { 
+                if (private$tangent_handler$tangent_images |> is.null()) { 
                     self$compute_tangents()
                 } 
                 self$compute_vecs()
