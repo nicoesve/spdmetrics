@@ -9,23 +9,13 @@ CSample <- R6::R6Class(
     public = list(
         initialize = function(conns = NULL, tan_imgs = NULL, 
                               vec_imgs = NULL, centered = NULL, metric) {
-            if (is.null(metric)) stop("metric must be specified.")
+            validate_metric(metric)
             private$metric <- metric
             private$tangent_handler <- TangentImageHandler$new(metric)  # Initialize TangentImageHandler
 
             if (!is.null(conns)) {
-                if (!is.null(tan_imgs) || !is.null(vec_imgs)) {
-                    stop("When initializing, if conns is not NULL, tan_imgs and vec_imgs must be NULL.")
-                }
-
-                if (!is.null(centered)) { 
-                    warning("If conns is not NULL, centered is ignored")
-                }
-
-                class_flag <- conns |> 
-                    purrr::map_lgl(\(x) inherits(x, "dppMatrix")) |> all()
-                if (!class_flag) stop("conns must be a list of dppMatrix objects.")
-
+                validate_conns(conns, tan_imgs, vec_imgs, centered)
+                
                 n <- length(conns); p <- nrow(conns[[1]]); d <- p * (p + 1) / 2
                 private$conns <- conns
                 private$vec_imgs <- NULL; private$n <- n; private$p <- p
@@ -33,24 +23,7 @@ CSample <- R6::R6Class(
                 private$var <- NULL; private$s_cov <- NULL
 
             } else if (!is.null(tan_imgs)) {
-                if (!is.null(vec_imgs)) {
-                    stop("If tan_imgs is not NULL, conns and vec_imgs must be NULL.")
-                }
-                if (is.null(centered)) {
-                    stop("If tan_imgs is not NULL, centered must be specified.")
-                }
-                if (!is.logical(centered)) stop("centered must be a logical.")
-                if (!inherits(tan_imgs[[1]], "dppMatrix")) {
-                    stop("The first element of tan_imgs must be a dppMatrix object.")
-                }
-                if (!is.list(tan_imgs[[2]])) {
-                    stop("The second element of tan_imgs must be a list.")
-                }
-                class_flag <- tan_imgs[[2]] |> 
-                    purrr::map_lgl(\(x) inherits(x, "dspMatrix")) |> all()
-                if (!class_flag) {
-                    stop("The second element of tan_imgs must be a list of dspMatrix objects.")
-                }
+                validate_tan_imgs(tan_imgs, vec_imgs, centered)
 
                 n <- length(tan_imgs[[2]]); p <- nrow(tan_imgs[[1]]); d <- p * (p + 1) / 2
                 frechet_mean <- if (centered) tan_imgs[[1]] else NULL
@@ -60,19 +33,7 @@ CSample <- R6::R6Class(
                 private$var <- NULL; private$s_cov <- NULL
                 private$tangent_handler$set_tangent_images(tan_imgs[[1]], tan_imgs[[2]])  # Set tangent images directly
             } else {
-                if (is.null(vec_imgs)) {
-                    stop("At least one of conns, tan_imgs, or vec_imgs must be specified.")
-                }
-                if (is.null(centered)) {
-                    stop("If vec_imgs is not NULL, centered must be specified.")
-                }
-                if (!is.logical(centered)) stop("centered must be a logical.")
-                if (!inherits(vec_imgs[[1]], "dppMatrix")) {
-                    stop("The first element of vec_imgs must be a dppMatrix object.")
-                }
-                if (!is.matrix(vec_imgs[[2]])) {
-                    stop("The second element of vec_imgs must be a matrix.")
-                }
+               validate_vec_imgs(vec_imgs, centered)
 
                 n <- nrow(vec_imgs[[2]])
                 p <- nrow(vec_imgs[[1]])

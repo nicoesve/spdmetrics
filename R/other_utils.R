@@ -110,5 +110,92 @@ compute_fmean <- function(sample, tol = 0.05, max_iter = 20, lr = 0.2) {
     sample$frechet_mean <- sample$tangent_handler$reference_point
 }
 
+#' Validate Metric
+#'
+#' Validates that the metric is not NULL.
+#'
+#' @param metric The metric to validate.
+#' @return None. Throws an error if the metric is NULL.
+validate_metric <- function(metric) {
+    if (is.null(metric)) stop("metric must be specified.")
+}
+
+#' Validate Connections
+#'
+#' Validates the connections input.
+#'
+#' @param conns List of connection matrices.
+#' @param tan_imgs List of tangent images.
+#' @param vec_imgs List of vector images.
+#' @param centered Logical indicating if the data is centered.
+#' @return None. Throws an error if the validation fails.
+validate_conns <- function(conns, tan_imgs, vec_imgs, centered) {
+    if (!is.null(conns)) {
+        if (!is.null(tan_imgs) || !is.null(vec_imgs)) {
+            stop("When initializing, if conns is not NULL, tan_imgs and vec_imgs must be NULL.")
+        }
+        if (!is.null(centered)) { 
+            warning("If conns is not NULL, centered is ignored")
+        }
+        class_flag <- conns |> 
+            purrr::map_lgl(\(x) inherits(x, "dppMatrix")) |> all()
+        if (!class_flag) stop("conns must be a list of dppMatrix objects.")
+    }
+}
+
+#' Validate Tangent Images
+#'
+#' Validates the tangent images input.
+#'
+#' @param tan_imgs List of tangent images.
+#' @param vec_imgs List of vector images.
+#' @param centered Logical indicating if the data is centered.
+#' @return None. Throws an error if the validation fails.
+validate_tan_imgs <- function(tan_imgs, vec_imgs, centered) {
+    if (!is.null(tan_imgs)) {
+        if (!is.null(vec_imgs)) {
+            stop("If tan_imgs is not NULL, conns and vec_imgs must be NULL.")
+        }
+        if (is.null(centered)) {
+            stop("If tan_imgs is not NULL, centered must be specified.")
+        }
+        if (!is.logical(centered)) stop("centered must be a logical.")
+        if (!inherits(tan_imgs[[1]], "dppMatrix")) {
+            stop("The first element of tan_imgs must be a dppMatrix object.")
+        }
+        if (!is.list(tan_imgs[[2]])) {
+            stop("The second element of tan_imgs must be a list.")
+        }
+        class_flag <- tan_imgs[[2]] |> 
+            purrr::map_lgl(\(x) inherits(x, "dspMatrix")) |> all()
+        if (!class_flag) {
+            stop("The second element of tan_imgs must be a list of dspMatrix objects.")
+        }
+    }
+}
+
+#' Validate Vector Images
+#'
+#' Validates the vector images input.
+#'
+#' @param vec_imgs List of vector images.
+#' @param centered Logical indicating if the data is centered.
+#' @return None. Throws an error if the validation fails.
+validate_vec_imgs <- function(vec_imgs, centered) {
+    if (is.null(vec_imgs)) {
+        stop("At least one of conns, tan_imgs, or vec_imgs must be specified.")
+    }
+    if (is.null(centered)) {
+        stop("If vec_imgs is not NULL, centered must be specified.")
+    }
+    if (!is.logical(centered)) stop("centered must be a logical.")
+    if (!inherits(vec_imgs[[1]], "dppMatrix")) {
+        stop("The first element of vec_imgs must be a dppMatrix object.")
+    }
+    if (!is.matrix(vec_imgs[[2]])) {
+        stop("The second element of vec_imgs must be a matrix.")
+    }
+}
+
 
 
