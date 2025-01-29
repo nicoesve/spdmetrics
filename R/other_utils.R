@@ -52,5 +52,101 @@ relocate <- function(old_ref, new_ref, images, met) {
     )
 }
 
+#' Compute the Frechet Mean
+#'
+#' This function computes the Frechet mean of a sample using an iterative algorithm.
+#'
+#' @param sample An object of class `CSample` containing the sample data.
+#' @param tol A numeric value specifying the tolerance for convergence. Default is 0.05.
+#' @param max_iter An integer specifying the maximum number of iterations. Default is 20.
+#' @param lr A numeric value specifying the learning rate. Default is 0.2.
+#'
+#' @return The function updates the `frechet_mean` field of the `sample` object with the computed Frechet mean.
+#'
+#' @details
+#' The function iteratively updates the reference point of the sample until the change in the reference point is less than the specified tolerance or the maximum number of iterations is reached. If the tangent images are not already computed, they will be computed before starting the iterations.
+#'
+#' @examples
+#' \dontrun{
+#' sample <- CSample$new(conns = list_of_dppMatrix_objects, metric = some_metric)
+#' compute_fmean(sample, tol = 0.01, max_iter = 50, lr = 0.1)
+#' }
+compute_fmean <- function(sample, tol = 0.05, max_iter = 20, lr = 0.2) {
+    if (!is.null(sample$frechet_mean)) { 
+        warning("The Frechet mean has already been computed.")
+    }
+    if (is.null(sample$tangent_images)) { 
+        message("tangent images were null, so they will be computed")
+        sample$compute_tangents()
+    }
+    if (!is.numeric(tol)) stop("tol must be a numeric.")
+    if (max_iter < 1) stop("max_iter must be at least 1.")
+
+    aux_sample <- sample; delta <- Inf; iter <- 0
+
+    while ((delta > tol) && (iter < max_iter)) {
+        old_tan <- sample$tangent_images; iter <- iter + 1 
+        old_ref_pt <- sample$tangent_handler$reference_point
+
+        if (iter > max_iter) {
+            warning("Computation of Frechet mean exceeded maximum 
+                number of iterations.")
+        }
+
+        tan_step <- lr * Reduce(`+`, old_tan) / 
+            aux_sample$sample_size
+        new_ref_pt <- sample$metric$exp(old_ref_pt, tan_step)
+
+        delta <- Matrix::norm(new_ref_pt - old_ref_pt, "F") / 
+                Matrix::norm(old_ref_pt, "F")
+
+        new_tan_imgs <- relocate(old_ref_pt, new_ref_pt, old_tan, 
+            sample$metric) 
+
+        aux_sample <- CSample$new(
+            tan_imgs = list(new_ref_pt, new_tan_imgs),
+            centered = FALSE, metric = sample$metric)
+    }
+    sample$frechet_mean <- sample$tangent_handler$reference_point
+}
+compute_fmean <- function(sample, tol = 0.05, max_iter = 20, lr = 0.2) {
+    if (!is.null(sample$frechet_mean)) { 
+        warning("The Frechet mean has already been computed.")
+    }
+    if (is.null(sample$tangent_images)) { 
+        message("tangent images were null, so they will be computed")
+        sample$compute_tangents()
+    }
+    if (!is.numeric(tol)) stop("tol must be a numeric.")
+    if (max_iter < 1) stop("max_iter must be at least 1.")
+
+    aux_sample <- sample; delta <- Inf; iter <- 0
+
+    while ((delta > tol) && (iter < max_iter)) {
+        old_tan <- sample$tangent_images; iter <- iter + 1 
+        old_ref_pt <- sample$tangent_handler$reference_point
+
+        if (iter > max_iter) {
+            warning("Computation of Frechet mean exceeded maximum 
+                number of iterations.")
+        }
+
+        tan_step <- lr * Reduce(`+`, old_tan) / 
+            aux_sample$sample_size
+        new_ref_pt <- sample$metric$exp(old_ref_pt, tan_step)
+
+        delta <- Matrix::norm(new_ref_pt - old_ref_pt, "F") / 
+                Matrix::norm(old_ref_pt, "F")
+
+        new_tan_imgs <- relocate(old_ref_pt, new_ref_pt, old_tan, 
+            sample$metric) 
+
+        aux_sample <- CSample$new(
+            tan_imgs = list(new_ref_pt, new_tan_imgs),
+            centered = FALSE, metric = sample$metric)
+    }
+    sample$frechet_mean <- sample$tangent_handler$reference_point
+}
+
 
 

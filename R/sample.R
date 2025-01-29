@@ -118,42 +118,7 @@ CSample <- R6::R6Class(
                         private$vec_imgs[[2]][i, ])))
         },
         compute_fmean = function(tol = 0.05, max_iter = 20, lr = 0.2) {
-            if (!is.null(private$f_mean)) { 
-                warning("The Frechet mean has already been computed.")
-            }
-            if (is.null(private$tangent_handler$tangent_images)) { 
-                message("tangent images were null, so they will be computed")
-                self$compute_tangents()
-            }
-            if (!is.numeric(tol)) stop("tol must be a numeric.")
-            if (max_iter < 1) stop("max_iter must be at least 1.")
-
-            aux_sample <- self; delta <- Inf; iter <- 0
-
-            while ((delta > tol) && (iter < max_iter)) {
-                old_tan <- private$tangent_handler$tangent_images; iter <- iter + 1 
-                old_ref_pt <- private$tangent_handler$reference_point
-
-                if (iter > max_iter) {
-                    warning("Computation of Frechet mean exceeded maximum 
-                        number of iterations.")
-                }
-
-                tan_step <- lr * Reduce(`+`, old_tan) / 
-                    aux_sample$sample_size
-                new_ref_pt <- private$metric$exp(old_ref_pt, tan_step)
-
-                delta <- Matrix::norm(new_ref_pt - old_ref_pt, "F") / 
-                        Matrix::norm(old_ref_pt, "F")
-
-                new_tan_imgs <- relocate(old_ref_pt, new_ref_pt, old_tan, 
-                    private$metric) 
-
-                aux_sample <- CSample$new(
-                    tan_imgs = list(new_ref_pt, new_tan_imgs),
-                    centered = FALSE, metric = private$metric)
-            }
-            private$f_mean <- private$tangent_handler$reference_point
+            compute_fmean(self, tol, max_iter, lr)
         },
         change_ref_pt = function(new_ref_pt) {
             if (is.null(private$tangent_handler$tangent_images)) {
