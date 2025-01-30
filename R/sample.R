@@ -46,7 +46,7 @@ CSample <- R6::R6Class(
                 private$s_cov <- NULL
                 private$tangent_handler$set_tangent_images(
                     tan_imgs[[1]], tan_imgs[[2]]
-                ) # Set tangent images directly
+                )
             } else {
                 validate_vec_imgs(vec_imgs, centered)
 
@@ -69,11 +69,11 @@ CSample <- R6::R6Class(
                 private$var <- NULL
                 private$s_cov <- NULL
             }
+            default_ref_pt <- diag(p) |>
+                methods::as("dpoMatrix") |>
+                Matrix::pack()
         },
-        compute_tangents = function(ref_pt = diag(private$p) |>
-                                        Matrix::nearPD() |>
-                                        _$mat |>
-                                        Matrix::pack()) {
+        compute_tangents = function(ref_pt = default_ref_pt) {
             if (!inherits(ref_pt, "dppMatrix")) {
                 stop("ref_pt must be a dppMatrix object.")
             }
