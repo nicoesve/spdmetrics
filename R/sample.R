@@ -1,39 +1,54 @@
 CSample <- R6::R6Class(
     classname = "CSample",
     private = list(
-        conns = NULL, vec_imgs = NULL, 
-        n = NULL, p = NULL, d = NULL, centered = NULL, 
+        conns = NULL, vec_imgs = NULL,
+        n = NULL, p = NULL, d = NULL, centered = NULL,
         f_mean = NULL, metric = NULL, var = NULL, s_cov = NULL,
-        tangent_handler = NULL  # Added field for TangentImageHandler
+        tangent_handler = NULL
     ),
     public = list(
-        initialize = function(conns = NULL, tan_imgs = NULL, 
+        initialize = function(conns = NULL, tan_imgs = NULL,
                               vec_imgs = NULL, centered = NULL, metric) {
             validate_metric(metric)
             private$metric <- metric
-            private$tangent_handler <- TangentImageHandler$new(metric)  # Initialize TangentImageHandler
+            private$tangent_handler <- TangentImageHandler$new(metric)
 
             if (!is.null(conns)) {
                 validate_conns(conns, tan_imgs, vec_imgs, centered)
-                
-                n <- length(conns); p <- nrow(conns[[1]]); d <- p * (p + 1) / 2
-                private$conns <- conns
-                private$vec_imgs <- NULL; private$n <- n; private$p <- p
-                private$d <- d; private$centered <- NULL; private$f_mean <- NULL
-                private$var <- NULL; private$s_cov <- NULL
 
+                n <- length(conns)
+                p <- nrow(conns[[1]])
+                d <- p * (p + 1) / 2
+                private$conns <- conns
+                private$vec_imgs <- NULL
+                private$n <- n
+                private$p <- p
+                private$d <- d
+                private$centered <- NULL
+                private$f_mean <- NULL
+                private$var <- NULL
+                private$s_cov <- NULL
             } else if (!is.null(tan_imgs)) {
                 validate_tan_imgs(tan_imgs, vec_imgs, centered)
 
-                n <- length(tan_imgs[[2]]); p <- nrow(tan_imgs[[1]]); d <- p * (p + 1) / 2
+                n <- length(tan_imgs[[2]])
+                p <- nrow(tan_imgs[[1]])
+                d <- p * (p + 1) / 2
                 frechet_mean <- if (centered) tan_imgs[[1]] else NULL
                 private$conns <- NULL
-                private$vec_imgs <- NULL; private$n <- n; private$p <- p; private$d <- d
-                private$centered <- centered; private$f_mean <- frechet_mean
-                private$var <- NULL; private$s_cov <- NULL
-                private$tangent_handler$set_tangent_images(tan_imgs[[1]], tan_imgs[[2]])  # Set tangent images directly
+                private$vec_imgs <- NULL
+                private$n <- n
+                private$p <- p
+                private$d <- d
+                private$centered <- centered
+                private$f_mean <- frechet_mean
+                private$var <- NULL
+                private$s_cov <- NULL
+                private$tangent_handler$set_tangent_images(
+                    tan_imgs[[1]], tan_imgs[[2]]
+                ) # Set tangent images directly
             } else {
-               validate_vec_imgs(vec_imgs, centered)
+                validate_vec_imgs(vec_imgs, centered)
 
                 n <- nrow(vec_imgs[[2]])
                 p <- nrow(vec_imgs[[1]])
@@ -45,35 +60,51 @@ CSample <- R6::R6Class(
                 frechet_mean <- if (centered) vec_imgs[[1]] else NULL
 
                 private$conns <- NULL
-                private$vec_imgs <- vec_imgs; private$n <- n; private$p <- p
-                private$d <- d; private$centered <- centered; 
-                private$f_mean <- frechet_mean; private$var <- NULL; private$s_cov <- NULL
+                private$vec_imgs <- vec_imgs
+                private$n <- n
+                private$p <- p
+                private$d <- d
+                private$centered <- centered
+                private$f_mean <- frechet_mean
+                private$var <- NULL
+                private$s_cov <- NULL
             }
         },
-        compute_tangents = function(
-            ref_pt = diag(private$p) |> Matrix::nearPD() |> 
-                _$mat |> Matrix::pack()) {
-            if (!inherits(ref_pt, "dppMatrix")) { 
+        compute_tangents = function(ref_pt = diag(private$p) |>
+                                        Matrix::nearPD() |>
+                                        _$mat |>
+                                        Matrix::pack()) {
+            if (!inherits(ref_pt, "dppMatrix")) {
                 stop("ref_pt must be a dppMatrix object.")
             }
             if (is.null(private$conns)) stop("conns must be specified.")
-            private$tangent_handler$set_reference_point(ref_pt)  # Set reference point
-            private$tangent_handler$compute_tangents(private$conns)  # Compute tangents
+            private$tangent_handler$set_reference_point(ref_pt)
+            private$tangent_handler$compute_tangents(private$conns)
         },
         compute_conns = function() {
-            if (is.null(private$tangent_handler$tangent_images)) stop("tangent images must be specified.")
+            if (is.null(private$tangent_handler$tangent_images)) {
+                stop("tangent images must be specified.")
+            }
             private$conns <- private$tangent_handler$compute_conns()
         },
         compute_vecs = function() {
-            if (is.null(private$tangent_handler$tangent_images)) stop("tangent images must be specified.")
+            if (is.null(private$tangent_handler$tangent_images)) {
+                stop("tangent images must be specified.")
+            }
             private$vec_imgs <- private$tangent_handler$compute_vecs()
         },
         compute_unvecs = function() {
             if (is.null(private$vec_imgs)) stop("vec_imgs must be specified.")
-            private$tangent_handler$set_tangent_images(private$vec_imgs[[1]], 
-                1:nrow(private$vec_imgs[[2]]) |> 
-                purrr::map(\(i) private$metric$unvec(private$vec_imgs[[1]], 
-                        private$vec_imgs[[2]][i, ])))
+            private$tangent_handler$set_tangent_images(
+                private$vec_imgs[[1]],
+                1:nrow(private$vec_imgs[[2]]) |>
+                    purrr::map(\(i) {
+                        private$metric$unvec(
+                            private$vec_imgs[[1]],
+                            private$vec_imgs[[2]][i, ]
+                        )
+                    })
+            )
         },
         compute_fmean = function(tol = 0.05, max_iter = 20, lr = 0.2) {
             compute_fmean(self, tol, max_iter, lr)
@@ -82,41 +113,47 @@ CSample <- R6::R6Class(
             if (is.null(private$tangent_handler$tangent_images)) {
                 stop("tangent images have not been computed")
             }
-            if (!inherits(new_ref_pt, "dppMatrix")) { 
+            if (!inherits(new_ref_pt, "dppMatrix")) {
                 stop("new_ref_pt must be a dppMatrix object.")
             }
-            private$tangent_handler$relocate_tangents(new_ref_pt)  # Relocate tangents
+            private$tangent_handler$relocate_tangents(new_ref_pt)
         },
         center = function() {
-            if (is.null(private$tangent_handler$tangent_images)) stop("tangent images must be specified.")
+            if (is.null(private$tangent_handler$tangent_images)) {
+                stop("tangent images must be specified.")
+            }
             if (!(private$centered |> is.null())) {
                 if (private$centered) stop("The sample is already centered.")
             }
             if (is.null(private$f_mean)) self$compute_fmean()
-            private$centered <- TRUE; self$change_ref_pt(private$f_mean)
+            private$centered <- TRUE
+            self$change_ref_pt(private$f_mean)
         },
         compute_variation = function() {
             if (self$vector_images |> is.null()) {
-                if (private$tangent_handler$tangent_images |> is.null()) { 
+                if (private$tangent_handler$tangent_images |> is.null()) {
                     self$compute_tangents()
-                } 
+                }
                 self$compute_vecs()
             }
 
             if (is.null(private$vec_imgs)) stop("vec_imgs must be specified.")
             if (is.null(private$centered) || !private$centered) {
-                self$compute_unvecs(); self$center(); self$compute_vecs()
+                self$compute_unvecs()
+                self$center()
+                self$compute_vecs()
             }
             private$var <- private$vec_imgs[[2]] |>
-                apply(X = _, MARGIN = 1, FUN = function(x) sum(x^2)) |> mean()
+                apply(X = _, MARGIN = 1, FUN = function(x) sum(x^2)) |>
+                mean()
         },
         compute_sample_cov = function() {
             if (self$vector_images |> is.null()) {
-                if (private$tangent_handler$tangent_images |> is.null()) { 
+                if (private$tangent_handler$tangent_images |> is.null()) {
                     self$compute_tangents()
-                } 
+                }
                 self$compute_vecs()
-            } 
+            }
 
             if (is.null(private$vec_imgs)) stop("vec_imgs must be specified.")
             private$s_cov <- cov(private$vec_imgs[[2]])
@@ -136,4 +173,3 @@ CSample <- R6::R6Class(
         sample_cov = function() private$s_cov
     )
 )
-
