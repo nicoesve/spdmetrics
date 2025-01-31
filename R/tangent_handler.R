@@ -1,4 +1,11 @@
-TangentImageHandler <- R6::R6Class(
+#' TangentImageHandler Class
+#'
+#' This class handles tangent images on a manifold. It provides methods to set a reference point, compute tangents, and perform various operations using a provided metric. # nolint: line_length_linter.
+#'
+#' @field reference_point The current reference point on the manifold.
+#' @field tangent_images List of tangent images (dspMatrix objects).
+#' @field metric rmetric object for operations.
+TangentImageHandler <- R6::R6Class( # nolint: object_name_linter.
     classname = "TangentImageHandler",
     private = list(
         reference_point = NULL, # The current reference point on the manifold
@@ -6,18 +13,30 @@ TangentImageHandler <- R6::R6Class(
         metric = NULL # Metric object for operations
     ),
     public = list(
+        #' Initialize the TangentImageHandler
+        #'
+        #' @param metric An rmetric object for operations.
+        #' @param reference_point An optional reference point on the manifold.
+        #' @return A new instance of TangentImageHandler.
         initialize = function(metric, reference_point = NULL) {
             if (is.null(metric)) stop("Metric object must be provided.")
             private$metric <- metric
             private$reference_point <- reference_point
             private$tangent_images <- list()
         },
+
+        #' Set a new reference point.
+        #'
+        #' @description If tangent images have been created, it recomputes them by mapping to the manifold and then to the new tangent space # nolint: line_length_linter
+        #'
+        #' @param new_ref_pt A new reference point of class dppMatrix.
+        #' @return None.
         set_reference_point = function(new_ref_pt) {
             if (!inherits(new_ref_pt, "dppMatrix")) {
                 stop("Reference point must be of class dppMatrix.")
             }
             if (!is.null(private$reference_point) &&
-                !is.null(private$tangent_images)) {
+                !is.null(private$tangent_images)) { # nolint: indentation_linter, line_length_linter.
                 private$tangent_images <- private$tangent_images |>
                     purrr::map(
                         \(tan) private$metric$exp(private$reference_point, tan)
@@ -26,6 +45,11 @@ TangentImageHandler <- R6::R6Class(
             }
             private$reference_point <- new_ref_pt
         },
+
+        #' Computes the tangent images from the points in the manifold
+        #'
+        #' @param manifold points A list of connectomes
+        #' @return None
         compute_tangents = function(manifold_points) {
             if (is.null(private$reference_point)) {
                 stop("Reference point must be set before computing tangents.")
@@ -35,12 +59,20 @@ TangentImageHandler <- R6::R6Class(
                     \(point) private$metric$log(private$reference_point, point)
                 )
         },
+
+        #' Computes vectorizations from tangent images
+        #'
+        #' @return A matrix, each row of which is a vectorization
         compute_vecs = function() {
             self$tangent_images |>
                 purrr::map(\(tan) metric$vec(self$reference_point, tan)) |>
                 do.call(rbind, args = _) |>
                 (\(x) list(self$reference_point, x))()
         },
+
+        #' Computes connectomes from tangent images
+        #'
+        #' @return A list of connectomes
         compute_conns = function() {
             if (is.null(private$tangent_images)) {
                 stop("tangent images must be specified.")
