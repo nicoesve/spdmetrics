@@ -75,6 +75,7 @@ relocate <- function(old_ref, new_ref, images, met) {
 #' compute_fmean(sample, tol = 0.01, max_iter = 50, lr = 0.1)
 #' }
 compute_fmean <- function(sample, tol = 0.05, max_iter = 20, lr = 0.2) {
+    # Validating parameters
     if (!is.null(sample$frechet_mean)) {
         warning("The Frechet mean has already been computed.")
     }
@@ -99,6 +100,7 @@ compute_fmean <- function(sample, tol = 0.05, max_iter = 20, lr = 0.2) {
                 number of iterations.")
         }
 
+        # Computing the step
         tan_step <- lr * Reduce(`+`, old_tan) /
             aux_sample$sample_size
         new_ref_pt <- sample$metric$exp(old_ref_pt, tan_step)
@@ -106,6 +108,7 @@ compute_fmean <- function(sample, tol = 0.05, max_iter = 20, lr = 0.2) {
         delta <- Matrix::norm(new_ref_pt - old_ref_pt, "F") /
             Matrix::norm(old_ref_pt, "F")
 
+        # Mapping tangent images to the new step
         new_tan_imgs <- relocate(
             old_ref_pt, new_ref_pt, old_tan,
             sample$metric
