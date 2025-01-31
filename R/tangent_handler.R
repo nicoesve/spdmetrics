@@ -72,6 +72,7 @@ TangentImageHandler <- R6::R6Class( # nolint: object_name_linter.
 
         #' Computes connectomes from tangent images
         #'
+        #' @throws Error if the tangent images have not been specified
         #' @return A list of connectomes
         compute_conns = function() {
             if (is.null(private$tangent_images)) {
@@ -82,6 +83,12 @@ TangentImageHandler <- R6::R6Class( # nolint: object_name_linter.
                     \(tan) private$metric$exp(private$reference_point, tan)
                 )
         },
+        #' Setter for the tangent images
+        #'
+        #' @param reference_point A connectome
+        #' @param tangent_images A list of tangent images
+        #' @throws Error if the reference point is not an object of class dppMatrix # nolint: line_length_linter
+        #' @return None
         set_tangent_images = function(reference_point, tangent_images) {
             if (!inherits(reference_point, "dppMatrix")) {
                 stop("Reference point must be of class dppMatrix.")
@@ -95,29 +102,42 @@ TangentImageHandler <- R6::R6Class( # nolint: object_name_linter.
             private$reference_point <- reference_point
             private$tangent_images <- tangent_images
         },
+
+        #' Appends a matrix to the list of tangent images
+        #'
+        #' @param image Matrix to be added
+        #' @throws Error if the matrix is not of type dspMatrix
         add_tangent_image = function(image) {
             if (!inherits(image, "dspMatrix")) {
                 stop("Tangent image must be of class dspMatrix.")
             }
             private$tangent_images <- c(private$tangent_images, list(image))
         },
+
+        #' Tangent images getter
+        #'
+        #' @return list of tangent matrices
         get_tangent_images = function() {
             private$tangent_images
         },
+
+        #' Wrapper for set_reference_point
+        #'
+        #' @return None
         relocate_tangents = function(new_ref_pt) {
             self$set_reference_point(new_ref_pt)
-        },
-        clear_tangents = function() {
-            private$tangent_images <- list()
         }
     ),
     active = list(
+        #' @field reference_point A matrix of type dppMatrix
         reference_point = function(value) {
             if (missing(value)) {
                 return(private$reference_point)
             }
             self$set_reference_point(value)
         },
+
+        #' @field tangent_images A list of dspMatrix objects
         tangent_images = function() {
             self$get_tangent_images()
         }

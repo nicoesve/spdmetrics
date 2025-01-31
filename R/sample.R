@@ -1,4 +1,4 @@
-#' conn_sample Class
+#' CSample Class
 #'
 #' @description
 #' This class represents a sample of connectomes, with various properties and methods to handle their tangent and vectorized images. # nolint: line_length_linter.
@@ -16,8 +16,8 @@
 #' @field tangent_handler Handler for tangent images.
 #'
 #' @export
-conn_sample <- R6::R6Class( # nolint: cyclocomp_linter
-    classname = "conn_sample",
+CSample <- R6::R6Class( # nolint: cyclocomp_linter
+    classname = "CSample",
     private = list(
         conns = NULL, vec_imgs = NULL,
         n = NULL, p = NULL, d = NULL, centered = NULL,
@@ -25,7 +25,7 @@ conn_sample <- R6::R6Class( # nolint: cyclocomp_linter
         tangent_handler = NULL
     ),
     public = list(
-        #' Initialize a conn_sample object
+        #' Initialize a CSample object
         #'
         #' @param conns A list of connectomes (default is NULL).
         #' @param tan_imgs A list of tangent images (default is NULL).
@@ -33,10 +33,10 @@ conn_sample <- R6::R6Class( # nolint: cyclocomp_linter
         #' @param centered Boolean indicating whether tangent or vectorized images are centered (default is NULL). # nolint: line_length_linter
         #' @param metric Object of class `rmetric` representing the Riemannian metric used. # nolint: line_length_linter
         #'
-        #' @return A new `conn_sample` object.
+        #' @return A new `CSample` object.
         #' @examples
         #' data(airm)
-        #' conn_sample <- conn_sample$new(
+        #' conn_sample <- CSample$new(
         #' conns = list_of_conns,
         #' metric = airm
         #' )
@@ -132,7 +132,7 @@ conn_sample <- R6::R6Class( # nolint: cyclocomp_linter
         #' @throws Error if `ref_pt` is not a `dppMatrix` object or if `conns` is not specified. # nolint: line_length_linter
         #' @examples
         #' \dontrun{
-        #'   conn_sample$compute_tangents(ref_pt = some_ref_pt)
+        #'   CSample$compute_tangents(ref_pt = some_ref_pt)
         #' }
         compute_tangents = function(ref_pt = default_ref_pt) {
             if (!inherits(ref_pt, "dppMatrix")) {
@@ -152,7 +152,7 @@ conn_sample <- R6::R6Class( # nolint: cyclocomp_linter
         #' @throws Error if tangent images are not specified.
         #' @examples
         #' \dontrun{
-        #'   conn_sample$compute_conns()
+        #'   CSample$compute_conns()
         #' }
         compute_conns = function() {
             if (is.null(private$tangent_handler$tangent_images)) {
@@ -170,7 +170,7 @@ conn_sample <- R6::R6Class( # nolint: cyclocomp_linter
         #' @throws Error if tangent images are not specified.
         #' @examples
         #' \dontrun{
-        #'   conn_sample$compute_vecs()
+        #'   CSample$compute_vecs()
         #' }
         compute_vecs = function() {
             if (is.null(private$tangent_handler$tangent_images)) {
@@ -188,7 +188,7 @@ conn_sample <- R6::R6Class( # nolint: cyclocomp_linter
         #' @throws Error if `vec_imgs` is not specified.
         #' @examples
         #' \dontrun{
-        #'   conn_sample$compute_unvecs()
+        #'   CSample$compute_unvecs()
         #' }
         compute_unvecs = function() {
             if (is.null(private$vec_imgs)) stop("vec_imgs must be specified.")
@@ -216,7 +216,7 @@ conn_sample <- R6::R6Class( # nolint: cyclocomp_linter
         #' @return None
         #' @examples
         #' \dontrun{
-        #'   conn_sample$compute_fmean(tol = 0.01, max_iter = 30, lr = 0.1)
+        #'   CSample$compute_fmean(tol = 0.01, max_iter = 30, lr = 0.1)
         #' }
         compute_fmean = function(tol = 0.05, max_iter = 20, lr = 0.2) {
             compute_fmean(self, tol, max_iter, lr)
@@ -233,7 +233,7 @@ conn_sample <- R6::R6Class( # nolint: cyclocomp_linter
         #' @throws Error if tangent images have not been computed or if `new_ref_pt` is not a `dppMatrix` object. # nolint: line_length_linter
         #' @examples
         #' \dontrun{
-        #'   conn_sample$change_ref_pt(new_ref_pt)
+        #'   CSample$change_ref_pt(new_ref_pt)
         #' }
         change_ref_pt = function(new_ref_pt) {
             if (is.null(private$tangent_handler$tangent_images)) {
@@ -282,7 +282,7 @@ conn_sample <- R6::R6Class( # nolint: cyclocomp_linter
         #' @return None. This function is called for its side effects.
         #' @examples
         #' \dontrun{
-        #'   obj <- conn_sample$new()
+        #'   obj <- CSample$new()
         #'   obj$compute_sample_cov()
         #' }
         compute_sample_cov = function() {
