@@ -296,3 +296,15 @@ validate_unvec_args <- function(sigma, w) {
         stop("Dimensions of sigma and v don't match")
     }
 }
+
+#' Create an Identity Matrix
+
+#' @param sigma A matrix.
+#' @return An identity matrix of the same dimensions as `sigma`.
+id_matr <- function(sigma) {
+    sigma |>
+        nrow() |>
+        diag() |>
+        methods::as("dpoMatrix") |>
+        Matrix::pack()
+}

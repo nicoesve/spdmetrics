@@ -34,21 +34,6 @@ euclidean_exp <- function(ref_pt, tangent) {
     )
 }
 
-#' Create an Identity Matrix
-#'
-#' Converts a matrix into an identity matrix.
-#'
-#' @param sigma A matrix.
-#'
-#' @return An identity matrix of the same dimensions as `sigma`.
-id_matr <- function(sigma) {
-    sigma |>
-        nrow() |>
-        diag() |>
-        methods::as("dpoMatrix") |>
-        Matrix::pack()
-}
-
 #' Vectorize at Identity Matrix (Euclidean)
 #'
 #' Converts a symmetric matrix into a vector representation. # nolint: line_length_linter
