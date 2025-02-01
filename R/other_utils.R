@@ -210,3 +210,89 @@ validate_vec_imgs <- function(vec_imgs, centered) {
         stop("The second element of vec_imgs must be a matrix.")
     }
 }
+
+#' Validate arguments for Riemannian logarithms
+#'
+#' @param sigma A dppMatrix object
+#' @param lambda A dppMatrix object
+#' @throws Error if sigma and lambda are not of the same dimensions
+#' @return None
+validate_log_args <- function(sigma, lambda) {
+    inheritance_flag <- list(sigma, lambda) |>
+        purrr::map(\(x) inherits(x, "dppMatrix")) |>
+        all()
+
+    if (!inheritance_flag) {
+        stop("Both arguments should be of class dppMatrx")
+    }
+
+    dim_flag <- list(sigma, lambda) |>
+        purrr::map(\(x) x@Dim) |>
+        (\(l) identical(l[[1]], l[[2]]))()
+
+    if (!dim_flag) {
+        stop("Arguments should be matrices of the same dimension")
+    }
+}
+
+#' Validate arguments for Riemannian logarithms
+#'
+#' @param sigma A dppMatrix object
+#' @param lambda A dspMatrix object
+#' @throws Error if sigma and lambda are not of the same dimensions
+#' @return None
+validate_exp_args <- function(sigma, v) {
+    inheritance_flag <- c(
+        sigma |> inherits("dppMatrix"),
+        v |> inherits("dspMatrix")
+    ) |>
+        all()
+
+    if (!inheritance_flag) {
+        stop("sigma should be of class dppMatrx and v should be of class dspMatrix") # nolint: line_length_linter
+    }
+
+    dim_flag <- list(sigma, v) |>
+        purrr::map(\(x) x@Dim) |>
+        (\(l) identical(l[[1]], l[[2]]))()
+
+    if (!dim_flag) {
+        stop("Arguments should be matrices of the same dimension")
+    }
+}
+
+#' Validate arguments for vectorization
+#'
+#' @param sigma A dppMatrix object
+#' @param v A dspMatrix object
+#' @throws Error if sigma and v are not of the same dimensions
+#' @return None
+validate_vec_args <- function(sigma, v) {
+    validate_exp_args(sigma, v)
+}
+
+#' Validate arguments for inverse vectorization
+#'
+#' @param sigma A dppMatrix object
+#' @param w A numeric vector
+#' @throws Error if the dimensionalities don't match
+#' @return None
+validate_unvec_args <- function(sigma, w) {
+    inheritance_flag <- c(
+        inherits(sigma, "dppMatrix"),
+        inherits(w, what = c("numeric", "vector"))
+    ) |>
+        all()
+    if (!inheritance_flag) {
+        stop("sigma should be of class dppMatrix and v should be a numeric vector") # nolint: line_length_linter
+    }
+
+    dim_flag <- list(
+        sigma@Dim[1] * (sigma@Dim[1] + 1) / 2,
+        length(w) |> as.numeric()
+    ) |>
+        do.call(identical, args = _)
+    if (!dim_flag) {
+        stop("Dimensions of sigma and v don't match")
+    }
+}
