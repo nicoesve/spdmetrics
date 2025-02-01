@@ -1,21 +1,28 @@
+#' Compute the Euclidean Logarithm
+#'
+#' This function computes the Euclidean logarithmic map.
+#'
+#' @param ref_pt A reference point.
+#' @param mfd_pt A point on the manifold.
+#'
+#' @return The tangent space image of `mfd_pt` at `ref_pt`.
+#' @export
 euclidean_log <- function(ref_pt, mfd_pt) {
-    if (ref_pt |> inherits("dppMatrix") |> (\(x) !x)()) {
-        stop("reference point should be a positive definite matrix (dppMatrix object)") # nolint: line_length_linter
-    }
-    if (mfd_pt |> inherits("dspMatrix") |> (\(x) !x)()) {
-        stop("tangent point should be a symmetric matrix (dspMatrix object)") # nolint: line_length_linter
-    }
-
+    validate_log_args(ref_pt, mfd_pt)
     ref_pt - mfd_pt
 }
 
+#' Compute the Euclidean Exponential
+#'
+#' This function computes the Euclidean exponential map.
+#'
+#' @param ref_pt A reference point.
+#' @param tangent A tangent vector to be mapped back to the manifold at `ref_pt`. # nolint: line_length_linter
+#'
+#' @return The point on the manifold corresponding to the tangent vector at `ref_pt`. # nolint: line_length_linter
+#' @export
 euclidean_exp <- function(ref_pt, tangent) {
-    if (ref_pt |> inherits("dppMatrix") |> (\(x) !x)()) {
-        stop("reference point should be a positive definite matrix (dppMatrix object)") # nolint: line_length_linter
-    }
-    if (tangent |> inherits("dppMatrix") |> (\(x) !x)()) {
-        stop("tangent should be a symmetric matrix (dspMatrix object)") # nolint: line_length_linter
-    }
+    validate_exp_args(ref_pt, tangent)
     tryCatch(
         {
             chol(ref_pt + tangent)
@@ -25,4 +32,45 @@ euclidean_exp <- function(ref_pt, tangent) {
             stop("Exponential map is not defined for those arguments")
         }
     )
+}
+
+#' Create an Identity Matrix
+#'
+#' Converts a matrix into an identity matrix.
+#'
+#' @param sigma A matrix.
+#'
+#' @return An identity matrix of the same dimensions as `sigma`.
+id_matr <- function(sigma) {
+    sigma |>
+        nrow() |>
+        diag() |>
+        methods::as("dpoMatrix") |>
+        Matrix::pack()
+}
+
+#' Vectorize at Identity Matrix (Euclidean)
+#'
+#' Converts a symmetric matrix into a vector representation. # nolint: line_length_linter
+#'
+#' @param sigma A symmetric matrix.
+#' @param v A vector.
+#'
+#' @return A numeric vector, representing the vectorized tangent image.
+#' @export
+euclidean_vec <- function(sigma, v) {
+    airm_vec(sigma |> id_matr(), v)
+}
+
+#' Compute the Inverse Vectorization (Euclidean)
+#'
+#' Converts a vector back into a tangent matrix relative to a reference point using Euclidean metric. # nolint: line_length_linter
+#'
+#' @param sigma A symmetric matrix.
+#' @param w A numeric vector, representing the vectorized tangent image.
+#'
+#' @return A symmetric matrix, representing the tangent vector.
+#' @export
+euclidean_unvec <- function(sigma, w) {
+    airm_unvec(sigma |> id_matr(), w)
 }
