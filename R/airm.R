@@ -12,21 +12,7 @@
 #' airm_log(sigma, lambda)
 #' @export
 airm_log <- function(sigma, lambda) {
-    inheritance_flag <- list(sigma, lambda) |>
-        purrr::map(\(x) inherits(x, "dppMatrix")) |>
-        all()
-
-    if (!inheritance_flag) {
-        stop("Both arguments should be of class dppMatrx")
-    }
-
-    dim_flag <- list(sigma, lambda) |>
-        purrr::map(\(x) x@Dim) |>
-        (\(l) identical(l[[1]], l[[2]]))()
-
-    if (!dim_flag){
-        stop("Arguments should be matrices of the same dimension")
-    }
+    validate_log_args()
 
     sigma_sqrt <- expm::sqrtm(sigma) |>
         Matrix::nearPD() |>
@@ -49,7 +35,7 @@ airm_log <- function(sigma, lambda) {
             }
         )() |>
         (\(x) sigma_sqrt %*% x %*% sigma_sqrt)() |>
-        Matrix::Matrix(sparse = FALSE, doDiag=FALSE) |>
+        Matrix::Matrix(sparse = FALSE, doDiag = FALSE) |>
         Matrix::symmpart() |>
         Matrix::pack()
 }
@@ -68,33 +54,17 @@ airm_log <- function(sigma, lambda) {
 #' airm_exp(sigma, v)
 #' @export
 airm_exp <- function(sigma, v) {
-    inheritance_flag <- c(
-        sigma |> inherits("dppMatrix"),
-        v |> inherits("dspMatrix")
-    ) |>
-        all()
-
-    if (!inheritance_flag) {
-        stop("sigma should be of class dppMatrx and v should be of class dspMatrix") # nolint: line_length_linter
-    }
-
-    dim_flag <- list(sigma, v) |>
-        purrr::map(\(x) x@Dim) |>
-        (\(l) identical(l[[1]], l[[2]]))()
-
-    if (!dim_flag) {
-        stop("Arguments should be matrices of the same dimension")
-    } 
+    validate_exp_args()
 
     sigma_sqrt <- expm::sqrtm(sigma) |> Matrix::nearPD() |> _$mat
     sigma_sqrt_inv <- Matrix::solve(sigma_sqrt)
     v |> (\(x) sigma_sqrt_inv %*% x %*% sigma_sqrt_inv)() |>
-        Matrix::symmpart() |> 
+        Matrix::symmpart() |>
         as.matrix() |>
         expm::expm(method = "hybrid_Eigen_Ward") |>
-        (\(x) sigma_sqrt %*% x %*% sigma_sqrt)() |> 
-        Matrix::nearPD() |> 
-        _$mat |> 
+        (\(x) sigma_sqrt %*% x %*% sigma_sqrt)() |>
+        Matrix::nearPD() |>
+        _$mat |>
         Matrix::pack()
 }
 
@@ -141,20 +111,7 @@ vec_at_id <- function(v) {
 #' airm_vec(sigma, v)
 #' @export
 airm_vec <- function(sigma, v) {
-    inheritance_flag <- c(
-        inherits(sigma, "dppMatrix"),
-        inherits(v, "dspMatrix")
-    ) |> all()
-    if (!inheritance_flag) {
-        stop("sigma should be of class dppMatrix and v should be of class dspMatrix") # nolint: line_length_linter
-    }
-
-    dim_flag <- list(sigma, v) |>
-        purrr::map(\(x) x@Dim) |>
-        (\(x) identical(x[[1]], x[[2]]))()
-    if (!dim_flag) {
-        stop("Dimensions of sigma and v don't match")
-    }
+    validate_vec_args(sigma, v)
 
     sigma_sqrt <- expm::sqrtm(sigma) |>
         Matrix::nearPD() |>
@@ -181,23 +138,7 @@ airm_vec <- function(sigma, v) {
 #' airm_unvec(sigma, w)
 #' @export
 airm_unvec <- function(sigma, w) {
-    inheritance_flag <- c(
-        inherits(sigma, "dppMatrix"),
-        inherits(w, what = c("numeric", "vector"))
-    ) |>
-        all()
-    if (!inheritance_flag) {
-        stop("sigma should be of class dppMatrix and v should be a numeric vector") # nolint: line_length_linter
-    }
-
-    dim_flag <- list(
-        sigma@Dim[1] * ( sigma@Dim[1] + 1 ) / 2,
-        length(w) |> as.numeric()
-    ) |>
-        do.call(identical, args = _)
-    if (!dim_flag) {
-        stop("Dimensions of sigma and v don't match")
-    }
+    validate_unvec_args(sigma, w)
 
     sigma_sqrt <- expm::sqrtm(sigma) |>
         Matrix::nearPD() |>
