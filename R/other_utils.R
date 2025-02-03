@@ -308,3 +308,36 @@ id_matr <- function(sigma) {
         methods::as("dpoMatrix") |>
         Matrix::pack()
 }
+
+#' Differential of Matrix Logarithm Map
+#'
+#' Computes the differential of the matrix logarithm map at a point Sigma, evaluated at H # nolint: line_length_linter
+#'
+#' @param sigma A symmetric positive definite matrix of class dspMatrix
+#' @param H A symmetric matrix representing tangent vector of class dsyMatrix
+#' @return A symmetric matrix representing the differential evaluated at H of class dsyMatrix # nolint: line_length_linter
+#' @export
+dlog <- function(sigma, h) {
+    if (!inherits(sigma, "dppMatrix")) {
+        stop("sigma must be a symmetric positive definite matrix of class dppMatrix") # nolint: line_length_linter
+    }
+    if (!inherits(h, "dspMatrix")) {
+        stop("H must be a symmetric matrix of class dspMatrix")
+    }
+
+    aux_matr <- sigma |> id_matr()
+    n <- sigma |> nrow()
+    t_vals <- seq(0, 1, length.out = 100) # Integration points
+    dt <- t_vals[2] - t_vals[1]
+
+    result <- Matrix::Matrix(0, n, n, sparse = FALSE)
+    for (t in t_vals) {
+        gamma_t <- t * sigma + (1 - t) * aux_matr
+        gamma_t_inv <- Matrix::solve(gamma_t)
+        result <- result + gamma_t_inv %*% h %*% gamma_t_inv * dt
+    }
+
+    result |>
+        Matrix::symmpart() |>
+        Matrix::pack()
+}
