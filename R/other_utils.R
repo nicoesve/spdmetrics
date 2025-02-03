@@ -341,3 +341,54 @@ dlog <- function(sigma, h) {
         Matrix::symmpart() |>
         Matrix::pack()
 }
+
+#' Differential of Matrix Exponential Map
+#'
+#' Computes the differential of the matrix exponential map located at a point a, evaluated at x # nolint: line_length_linter
+#'
+#' @param a A symmetric matrix of class dspMatrix
+#' @param x A symmetric matrix representing tangent vector of class dspMatrix
+#' @return A positive definite symmetric matrix representing the differential located at a and evaluated at x, of class dppMatrix # nolint: line_length_linter
+#' @export
+dexp <- function(a, x) {
+    if (!inherits(a, "dspMatrix")) {
+        stop("a must be a symmetric matrix of class dspMatrix")
+    }
+    if (!inherits(x, "dspMatrix")) {
+        stop("x must be a symmetric matrix of class dspMatrix")
+    }
+
+    n <- a |> nrow()
+    t_vals <- seq(0, 1, length.out = 100) # Integration points
+    dt <- t_vals[2] - t_vals[1]
+
+    result <- Matrix::Matrix(0, n, n, sparse = FALSE)
+    for (t in t_vals) {
+        gamma_left <- (1 - t) * a |>
+            as.matrix() |>
+            expm::expm(method = "hybrid_Eigen_Ward")
+        gamma_right <- t * a |>
+            as.matrix() |>
+            expm::expm(method = "hybrid_Eigen_Ward")
+        result <- result + gamma_left %*% x %*% gamma_right * dt
+    }
+
+    result |>
+        Matrix::nearPD() |>
+        _$mat |>
+        Matrix::pack()
+}
+
+#' Wrapper for the matrix logarithm
+#'
+#' @param x A matrix
+#' @return Its matrix logarithm
+safe_logm <- function(x) {
+    tryCatch(
+        expm::logm(x, method = "Eigen"),
+        error = function(e) {
+            print(e)
+            expm::logm(x, method = "Higham08")
+        }
+    )
+}

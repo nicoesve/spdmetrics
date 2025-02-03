@@ -1,33 +1,47 @@
-#' Compute the Euclidean Logarithm
+#' Compute the Log-Euclidean Logarithm
 #'
 #' @param ref_pt A reference point.
 #' @param mfd_pt A point on the manifold.
 #'
 #' @return The tangent space image of `mfd_pt` at `ref_pt`.
 #' @export
-euclidean_log <- function(ref_pt, mfd_pt) {
+log_euclidean_log <- function(ref_pt, mfd_pt) {
     validate_log_args(ref_pt, mfd_pt)
-    ref_pt - mfd_pt
+
+    aux_matr_1 <- ref_pt |> safe_logm()
+    aux_matr_2 <- mfd_pt |> safe_logm()
+
+    aux_matr_3 <- aux_matr_1 - aux_matr_2
+
+    dexp(ref_pt, aux_matr_3)
 }
 
-#' Compute the Euclidean Exponential
+#' Compute the Log-Euclidean Exponential
+#'
+#' This function computes the Euclidean exponential map.
 #'
 #' @param ref_pt A reference point.
 #' @param tangent A tangent vector to be mapped back to the manifold at `ref_pt`. # nolint: line_length_linter
 #'
 #' @return The point on the manifold corresponding to the tangent vector at `ref_pt`. # nolint: line_length_linter
 #' @export
-euclidean_exp <- function(ref_pt, tangent) {
+log_euclidean_exp <- function(ref_pt, tangent) {
     validate_exp_args(ref_pt, tangent)
-    tryCatch(
-        {
-            chol(ref_pt + tangent)
-            ref_pt + tangent
-        },
-        error = function(e) {
-            stop("Exponential map is not defined for those arguments")
-        }
-    )
+
+    # compute the functions that compose the exponential
+    aux_matr_1 <- ref_pt |>
+        as.matrix() |>
+        expm::logm()
+    aux_matr_2 <- tangent |>
+        (\(x) dlog(ref_pt, x))()
+
+    aux_matr_3 <- aux_matr_1 + aux_matr_2
+
+    aux_matr_3 |>
+        expm::expm(method = "hybrid_Eigen_Ward") |>
+        Matrix::nearPD() |>
+        _$mat |>
+        Matrix::pack()
 }
 
 #' Vectorize at Identity Matrix (Euclidean)
@@ -39,7 +53,7 @@ euclidean_exp <- function(ref_pt, tangent) {
 #'
 #' @return A numeric vector, representing the vectorized tangent image.
 #' @export
-euclidean_vec <- function(sigma, v) {
+log_euclidean_vec <- function(sigma, v) {
     airm_vec(sigma |> id_matr(), v)
 }
 
@@ -52,6 +66,6 @@ euclidean_vec <- function(sigma, v) {
 #'
 #' @return A symmetric matrix, representing the tangent vector.
 #' @export
-euclidean_unvec <- function(sigma, w) {
+log_euclidean_unvec <- function(sigma, w) {
     airm_unvec(sigma |> id_matr(), w)
 }

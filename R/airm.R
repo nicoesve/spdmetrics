@@ -23,17 +23,7 @@ airm_log <- function(sigma, lambda) {
     lambda |> (\(x) sigma_sqrt_inv %*% x %*% sigma_sqrt_inv)() |>
         Matrix::symmpart() |>
         as.matrix() |>
-        (
-            \(x){
-                tryCatch(
-                    expm::logm(x, method = "Eigen"),
-                    error = function(e) {
-                        print(e)
-                        expm::logm(x, method = "Higham08")
-                    }
-                )
-            }
-        )() |>
+        safe_logm() |>
         (\(x) sigma_sqrt %*% x %*% sigma_sqrt)() |>
         Matrix::Matrix(sparse = FALSE, doDiag = FALSE) |>
         Matrix::symmpart() |>
