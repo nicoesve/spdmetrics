@@ -3,7 +3,7 @@ library(here)
 
 #' Run all R files in a directory
 #'
-#' @param dir_path Path to the directory containing R files. Defaults to current directory.
+#' @param dir_path Path to the directory containing R files. Defaults to current directory. # nolintr: line_length_linter
 #' @param pattern Pattern to match files. Defaults to "\\.R$" for R files.
 #' @param recursive Whether to search subdirectories. Defaults to FALSE.
 #' @param exclude Vector of filenames to exclude. Defaults to empty vector.
