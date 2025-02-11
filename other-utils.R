@@ -72,9 +72,9 @@ relocate <- function(old_ref, new_ref, images, met) {
 #'     conns = list_of_dppMatrix_objects,
 #'     metric = some_metric
 #' )
-#' compute_fmean(sample, tol = 0.01, max_iter = 50, lr = 0.1)
+#' compute_frechet_mean(sample, tol = 0.01, max_iter = 50, lr = 0.1)
 #' }
-compute_fmean <- function(sample, tol = 0.05, max_iter = 20, lr = 0.2) {
+compute_frechet_mean <- function(sample, tol = 0.05, max_iter = 20, lr = 0.2) {
     # Validating parameters
     if (!is.null(sample$frechet_mean)) {
         warning("The Frechet mean has already been computed.")
@@ -392,3 +392,8 @@ safe_logm <- function(x) {
         }
     )
 }
+
+# Set default reference point
+default_ref_pt <- diag(p) |>
+    methods::as("dpoMatrix") |>
+    Matrix::pack()

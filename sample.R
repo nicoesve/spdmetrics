@@ -114,11 +114,6 @@ CSample <- R6::R6Class( # nolint: cyclocomp_linter
                 private$var <- NULL
                 private$s_cov <- NULL
             }
-
-            # Set default reference point
-            default_ref_pt <- diag(p) |>
-                methods::as("dpoMatrix") |>
-                Matrix::pack()
         },
 
         #' Compute Tangent Images
