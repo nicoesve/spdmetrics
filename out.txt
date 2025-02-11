@@ -1,0 +1,246 @@
+
+> airm_log <- function(sigma, lambda) {
++     validate_log_args()
++     sigma_sqrt <- Matrix::nearPD(expm::sqrtm(sigma))$mat
++     sigma_sqrt_inv <- M .... [TRUNCATED] 
+
+> airm_exp <- function(sigma, v) {
++     validate_exp_args()
++     sigma_sqrt <- Matrix::nearPD(expm::sqrtm(sigma))$mat
++     sigma_sqrt_inv <- Matrix .... [TRUNCATED] 
+
+> vec_at_id <- function(v) {
++     if (!inherits(v, "dspMatrix")) {
++         stop("v should be an object of class dspMatrix")
++     }
++     w <- v@x
+ .... [TRUNCATED] 
+
+> airm_vec <- function(sigma, v) {
++     validate_vec_args(sigma, v)
++     sigma_sqrt <- Matrix::nearPD(expm::sqrtm(sigma))$mat
++     sigma_sqrt_inv < .... [TRUNCATED] 
+
+> airm_unvec <- function(sigma, w) {
++     validate_unvec_args(sigma, w)
++     sigma_sqrt <- Matrix::nearPD(expm::sqrtm(sigma))$mat
++     for (i in 1: .... [TRUNCATED] 
+
+> solve_lyapunov <- function(p, v) {
++     if (!inherits(p, "dppMatrix")) {
++         stop("p must be of class dppMatrix")
++     }
++     if (!inherits .... [TRUNCATED] 
+
+> bures_wasserstein_exp <- function(sigma, v) {
++     validate_exp_args(sigma, v)
++     l <- solve_lyapunov(sigma, v)
++     n <- sigma@Dim[1]
++     id .... [TRUNCATED] 
+
+> bures_wasserstein_log <- function(sigma, lambda) {
++     validate_log_args(sigma, lambda)
++     sigma_sqrt <- Matrix::nearPD(expm::sqrtm(sigma))$mat .... [TRUNCATED] 
+
+> bures_wasserstein_vec <- function(sigma, v) {
++     airm_vec(sigma, v)
++ }
+
+> bures_wasserstein_unvec <- function(sigma, w) {
++     airm_unvec(sigma, w)
++ }
+
+> euclidean_log <- function(ref_pt, mfd_pt) {
++     validate_log_args(ref_pt, mfd_pt)
++     ref_pt - mfd_pt
++ }
+
+> euclidean_exp <- function(ref_pt, tangent) {
++     validate_exp_args(ref_pt, tangent)
++     tryCatch({
++         chol(ref_pt + tangent)
++         re .... [TRUNCATED] 
+
+> euclidean_vec <- function(sigma, v) {
++     airm_vec(id_matr(sigma), v)
++ }
+
+> euclidean_unvec <- function(sigma, w) {
++     airm_unvec(id_matr(sigma), w)
++ }
+
+> log_cholesky_log <- function(ref_pt, mfd_pt) {
++     validate_log_args(ref_pt, mfd_pt)
++     l_ref <- t(chol(ref_pt))
++     l_mfd <- t(chol(mfd_pt)) .... [TRUNCATED] 
+
+> log_cholesky_exp <- function(ref_pt, tangent) {
++     validate_exp_args(ref_pt, tangent)
++     l_ref <- t(chol(ref_pt))
++     l_inv <- solve(l_ref)
+ .... [TRUNCATED] 
+
+> spd_isometry_to_identity <- function(sigma, v) {
++     validate_vec_args(sigma, v)
++     l_sigma <- t(chol(sigma))
++     l_inv <- solve(l_sigma)
++   .... [TRUNCATED] 
+
+> log_cholesky_vec <- function(sigma, v) {
++     validate_vec_args(sigma, v)
++     vec_at_id(spd_isometry_to_identity(sigma = sigma, v = v))
++ }
+
+> spd_isometry_from_identity <- function(sigma, v) {
++     validate_vec_args(sigma, v)
++     l_sigma <- t(chol(sigma))
++     v_sym <- Matrix::symmpart .... [TRUNCATED] 
+
+> log_cholesky_unvec <- function(sigma, w) {
++     validate_unvec_args(sigma, w)
++     w_scaled <- w
++     for (i in 1:sigma@Dim[1]) {
++         w_sca .... [TRUNCATED] 
+
+> log_euclidean_log <- function(ref_pt, mfd_pt) {
++     validate_log_args(ref_pt, mfd_pt)
++     aux_matr_1 <- safe_logm(ref_pt)
++     aux_matr_2 <- sa .... [TRUNCATED] 
+
+> log_euclidean_exp <- function(ref_pt, tangent) {
++     validate_exp_args(ref_pt, tangent)
++     aux_matr_1 <- expm::logm(as.matrix(ref_pt))
++     au .... [TRUNCATED] 
+
+> log_euclidean_vec <- function(sigma, v) {
++     airm_vec(id_matr(sigma), v)
++ }
+
+> log_euclidean_unvec <- function(sigma, w) {
++     airm_unvec(id_matr(sigma), w)
++ }
+
+> metric <- function(log, exp, vec, unvec) {
++     met <- list(log = log, exp = exp, vec = vec, unvec = unvec)
++     class(met) <- "rmetric"
++     ret .... [TRUNCATED] 
+
+> rspdnorm <- function(n, refpt, disp, met) {
++     p <- refpt@Dim[1]
++     d <- p * (p + 1)/2
++     mu <- rep(0, d)
++     Sigma <- as.matrix(disp)
++  .... [TRUNCATED] 
+
+> relocate <- function(old_ref, new_ref, images, met) {
++     furrr::future_map(images, function(tan) met$log(Sigma = new_ref, 
++         Lambda = met .... [TRUNCATED] 
+
+> compute_fmean <- function(sample, tol = 0.05, max_iter = 20, 
++     lr = 0.2) {
++     if (!is.null(sample$frechet_mean)) {
++         warning("The Fr ..." ... [TRUNCATED] 
+
+> validate_metric <- function(metric) {
++     if (is.null(metric)) 
++         stop("metric must be specified.")
++ }
+
+> validate_conns <- function(conns, tan_imgs, vec_imgs, 
++     centered) {
++     if (!is.null(conns)) {
++         if (!is.null(tan_imgs) || !is.null(v .... [TRUNCATED] 
+
+> validate_tan_imgs <- function(tan_imgs, vec_imgs, 
++     centered) {
++     if (!is.null(tan_imgs)) {
++         if (!is.null(vec_imgs)) {
++           .... [TRUNCATED] 
+
+> validate_vec_imgs <- function(vec_imgs, centered) {
++     if (is.null(vec_imgs)) {
++         stop("At least one of conns, tan_imgs, or vec_imgs must ..." ... [TRUNCATED] 
+
+> validate_log_args <- function(sigma, lambda) {
++     inheritance_flag <- all(purrr::map(list(sigma, lambda), function(x) inherits(x, 
++         "dpp ..." ... [TRUNCATED] 
+
+> validate_exp_args <- function(sigma, v) {
++     inheritance_flag <- all(c(inherits(sigma, "dppMatrix"), inherits(v, 
++         "dspMatrix")))
++      .... [TRUNCATED] 
+
+> validate_vec_args <- function(sigma, v) {
++     validate_exp_args(sigma, v)
++ }
+
+> validate_unvec_args <- function(sigma, w) {
++     inheritance_flag <- all(c(inherits(sigma, "dppMatrix"), inherits(w, 
++         what = c("numeric", .... [TRUNCATED] 
+
+> id_matr <- function(sigma) {
++     Matrix::pack(methods::as(diag(nrow(sigma)), "dpoMatrix"))
++ }
+
+> dlog <- function(sigma, h) {
++     if (!inherits(sigma, "dppMatrix")) {
++         stop("sigma must be a symmetric positive definite matrix of class  ..." ... [TRUNCATED] 
+
+> dexp <- function(a, x) {
++     if (!inherits(a, "dspMatrix")) {
++         stop("a must be a symmetric matrix of class dspMatrix")
++     }
++     if ( .... [TRUNCATED] 
+
+> safe_logm <- function(x) {
++     tryCatch(expm::logm(x, method = "Eigen"), error = function(e) {
++         print(e)
++         expm::logm(x, method = .... [TRUNCATED] 
+
+> CSample <- R6::R6Class(classname = "CSample", private = list(conns = NULL, 
++     vec_imgs = NULL, n = NULL, p = NULL, d = NULL, centered = NULL, 
++ .... [TRUNCATED] 
+
+> TangentImageHandler <- R6::R6Class(classname = "TangentImageHandler", 
++     private = list(reference_point = NULL, tangent_images = NULL, 
++        .... [TRUNCATED] 
+
+> library(testthat)
+
+> library(Matrix)
+
+> library(methods)
+
+> library(expm)
+
+> test_pd_mats <- list(Matrix::pack(Matrix::nearPD(Matrix::Matrix(c(2, 
++     0.5, 0.5, 3), nrow = 2))$mat), Matrix::pack(Matrix::nearPD(Matrix::Matri .... [TRUNCATED] 
+
+> airm <- metric(log = airm_log, exp = airm_exp, vec = airm_vec, 
++     unvec = airm_unvec)
+
+> log_euclidean <- metric(log = log_euclidean_log, exp = log_euclidean_exp, 
++     vec = log_euclidean_vec, unvec = log_euclidean_unvec)
+
+> euclidean <- metric(log = euclidean_log, exp = euclidean_exp, 
++     vec = euclidean_vec, unvec = euclidean_unvec)
+
+> log_cholesky <- metric(log = log_cholesky_log, exp = log_cholesky_exp, 
++     vec = log_cholesky_vec, unvec = log_cholesky_unvec)
+
+> bures_wasserstein <- metric(log = bures_wasserstein_log, 
++     exp = bures_wasserstein_exp, vec = bures_wasserstein_vec, 
++     unvec = bures_wasse .... [TRUNCATED] 
+
+> test_metric <- function(metric_obj, metric_name) {
++     test_that(sprintf("%s exponential map preserves matrix dimensions and positive definiteness ..." ... [TRUNCATED] 
+
+> test_metric(airm, "AIRM")
+── [1m[33mError[39m: AIRM exponential map preserves matrix dimensions and positive definiteness[22m ──
+Error in `validate_exp_args()`: argument "sigma" is missing, with no default
+[1mBacktrace:[22m
+[90m    [39m▆
+[90m 1. [39m└─metric_obj$exp(test_pd_mats[[1]], test_pd_mats[[2]])
+[90m 2. [39m  └─[1mglobal[22m validate_exp_args()
+[90m 3. [39m    └─[1mbase[22m::inherits(sigma, "dppMatrix")
+
