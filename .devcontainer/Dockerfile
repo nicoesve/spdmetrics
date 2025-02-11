@@ -1,4 +1,4 @@
-FROM rocker/r-ver:4.1.2
+FROM rocker/r-ver:latest
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -8,3 +8,5 @@ RUN apt-get update && apt-get install -y \
 
 # Install R packages
 RUN R -e "install.packages(c('Matrix', 'expm', 'purrr', 'R6', 'languageserver'))"
+
+RUN apt-get update && apt-get install -y git
