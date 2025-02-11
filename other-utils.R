@@ -393,7 +393,12 @@ safe_logm <- function(x) {
     )
 }
 
-# Set default reference point
-default_ref_pt <- diag(p) |>
-    methods::as("dpoMatrix") |>
-    Matrix::pack()
+#' Default reference point
+#'
+#' @param p the dimension
+#' @return A diagonal matrix of the desired dimension
+default_ref_pt <- function(p) {
+    diag(p) |>
+        methods::as("dpoMatrix") |>
+        Matrix::pack()
+}

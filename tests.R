@@ -120,7 +120,7 @@ test_metric <- function(metric_obj, metric_name) {
         # Test tangent space operations
         sample$compute_tangents()
         expect_false(is.null(sample$tangent_images))
-        expect_true(inherits(sample$tangent_images[[1]], "dppMatrix"))
+        expect_true(inherits(sample$tangent_images[[1]], "dspMatrix"))
 
         # Test vectorization
         sample$compute_vecs()

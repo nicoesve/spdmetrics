@@ -129,7 +129,7 @@ CSample <- R6::R6Class( # nolint: cyclocomp_linter
         #' \dontrun{
         #'   CSample$compute_tangents(ref_pt = some_ref_pt)
         #' }
-        compute_tangents = function(ref_pt = default_ref_pt) {
+        compute_tangents = function(ref_pt = default_ref_pt(private$p)) {
             if (!inherits(ref_pt, "dppMatrix")) {
                 stop("ref_pt must be a dppMatrix object.")
             }
