@@ -9,4 +9,6 @@ RUN apt-get update && apt-get install -y \
 # Install R packages
 RUN R -e "install.packages(c('Matrix', 'expm', 'purrr', 'R6', 'languageserver', 'here', 'testthat'))"
 
+RUN R -e 'install.packages("vscDebugger", repos = "https://manuelhentschel.r-universe.dev")'
+
 RUN apt-get update && apt-get install -y git

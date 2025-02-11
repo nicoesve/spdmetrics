@@ -1,13 +1,13 @@
 
 > airm_log <- function(sigma, lambda) {
-+     validate_log_args()
++     validate_log_args(sigma, lambda)
 +     sigma_sqrt <- Matrix::nearPD(expm::sqrtm(sigma))$mat
-+     sigma_sqrt_inv <- M .... [TRUNCATED] 
++     sigma_ .... [TRUNCATED] 
 
 > airm_exp <- function(sigma, v) {
-+     validate_exp_args()
++     validate_exp_args(sigma, v)
 +     sigma_sqrt <- Matrix::nearPD(expm::sqrtm(sigma))$mat
-+     sigma_sqrt_inv <- Matrix .... [TRUNCATED] 
++     sigma_sqrt_inv < .... [TRUNCATED] 
 
 > vec_at_id <- function(v) {
 +     if (!inherits(v, "dspMatrix")) {
@@ -236,11 +236,55 @@
 +     test_that(sprintf("%s exponential map preserves matrix dimensions and positive definiteness ..." ... [TRUNCATED] 
 
 > test_metric(airm, "AIRM")
-── [1m[33mError[39m: AIRM exponential map preserves matrix dimensions and positive definiteness[22m ──
-Error in `validate_exp_args()`: argument "sigma" is missing, with no default
+[32mTest passed[39m 🥇
+── [1m[35mWarning[39m: AIRM logarithm map preserves matrix dimensions and symmetry[22m ────────
+coercing argument of type 'list' to logical
 [1mBacktrace:[22m
 [90m    [39m▆
-[90m 1. [39m└─metric_obj$exp(test_pd_mats[[1]], test_pd_mats[[2]])
-[90m 2. [39m  └─[1mglobal[22m validate_exp_args()
-[90m 3. [39m    └─[1mbase[22m::inherits(sigma, "dppMatrix")
+[90m 1. [39m└─metric_obj$log(test_pd_mats[[1]], test_pd_mats[[2]])
+[90m 2. [39m  └─[1mglobal[22m validate_log_args(sigma, lambda)
+
+── [1m[35mWarning[39m: AIRM logarithm and exponential are mutual inverses[22m ─────────────────
+coercing argument of type 'list' to logical
+[1mBacktrace:[22m
+[90m    [39m▆
+[90m 1. [39m└─metric_obj$log(test_pd_mats[[1]], test_pd_mats[[2]])
+[90m 2. [39m  └─[1mglobal[22m validate_log_args(sigma, lambda)
+
+── [1m[35mWarning[39m: AIRM logarithm and exponential are mutual inverses[22m ─────────────────
+coercing argument of type 'list' to logical
+[1mBacktrace:[22m
+[90m    [39m▆
+[90m 1. [39m└─metric_obj$log(...)
+[90m 2. [39m  └─[1mglobal[22m validate_log_args(sigma, lambda)
+
+── [1m[35mWarning[39m: AIRM logarithm and exponential are mutual inverses[22m ─────────────────
+coercing argument of type 'list' to logical
+[1mBacktrace:[22m
+[90m    [39m▆
+[90m 1. [39m├─metric_obj$exp(...)
+[90m 2. [39m│ └─[1mglobal[22m validate_exp_args(sigma, v)
+[90m 3. [39m└─metric_obj$log(test_pd_mats[[1]], test_pd_mats[[2]])
+[90m 4. [39m  └─[1mglobal[22m validate_log_args(sigma, lambda)
+
+── [1m[35mWarning[39m: AIRM vectorization produces correct output dimensions[22m ──────────────
+coercing argument of type 'list' to logical
+[1mBacktrace:[22m
+[90m    [39m▆
+[90m 1. [39m└─metric_obj$log(test_pd_mats[[1]], test_pd_mats[[2]])
+[90m 2. [39m  └─[1mglobal[22m validate_log_args(sigma, lambda)
+
+── [1m[35mWarning[39m: AIRM vectorization and unvectorization are mutual inverses[22m ─────────
+coercing argument of type 'list' to logical
+[1mBacktrace:[22m
+[90m    [39m▆
+[90m 1. [39m└─metric_obj$log(test_pd_mats[[1]], test_pd_mats[[2]])
+[90m 2. [39m  └─[1mglobal[22m validate_log_args(sigma, lambda)
+
+── [1m[33mError[39m: AIRM CSample operations work correctly[22m ───────────────────────────────
+Error in `sample$compute_tangents()`: object 'default_ref_pt' not found
+[1mBacktrace:[22m
+[90m    [39m▆
+[90m 1. [39m└─sample$compute_tangents()
+[90m 2. [39m  └─[1mbase[22m::inherits(ref_pt, "dppMatrix")
 
