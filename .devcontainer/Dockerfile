@@ -7,6 +7,6 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev
 
 # Install R packages
-RUN R -e "install.packages(c('Matrix', 'expm', 'purrr', 'R6', 'languageserver'))"
+RUN R -e "install.packages(c('Matrix', 'expm', 'purrr', 'R6', 'languageserver', 'here', 'testthat'))"
 
 RUN apt-get update && apt-get install -y git
