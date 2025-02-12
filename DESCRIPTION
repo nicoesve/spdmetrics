@@ -1,23 +1,30 @@
-Package: RSPD
-Type: Package
-Title: R6 Classes for Managing Connectomes
+Package: spdmetrics
+Title: Riemannian Metrics for Symmetric Positive Definite Matrices
 Version: 0.1.0
-Author: Nicolas Escobar
-Maintainer: Nicolas Escobar <nescoba@iu.edu>
-Description: This package provides R6 classes for managing connectomes, organizing them into samples and subsamples. It includes functionality for computing Frechet means and projections to the tangent space, as well as computing Wilks' Lambda for ANOVA.
-License: GPL (>= 2)
+Authors@R: 
+    person(given = "Nicolas",
+           family = "Escobar",
+           role = c("aut", "cre"),
+           email = "nescoba@iu.edu"),
+           comment = c(ORCID = "0009-0006-0800-5692")
+    person(given = "Jaroslaw",
+           family = "Harezlak",
+           role = "ths")
+Description: Implements various Riemannian metrics for symmetric positive definite matrices, including AIRM (Affine Invariant Riemannian Metric), Log-Euclidean, Euclidean, Log-Cholesky, and Bures-Wasserstein metrics. Provides functions for computing logarithmic and exponential maps, vectorization, and statistical operations on the manifold of positive definite matrices.
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3
+Depends: R (>= 4.1.0)
 Imports: 
+    Matrix,
+    methods,
+    expm,
     R6,
     purrr,
-    Matrix,
-    MASS, 
-    expm,
-    furrr,
-    methods
-Depends: 
-    R (>= 3.5.0)
-Suggests:
-    testthat
-RoxygenNote: 7.1.1
+    MASS,
+    furrr
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
