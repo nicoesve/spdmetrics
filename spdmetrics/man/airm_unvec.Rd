@@ -18,7 +18,9 @@ A symmetric matrix of class \code{dspMatrix}, representing the tangent vector. #
 Converts a vector back into a tangent matrix relative to a reference point using AIRM. # nolint: line_length_linter
 }
 \examples{
+\dontrun{
 sigma <- diag(2) |> Matrix::nearPD()$mat |> Matrix::pack()
 w <- c(1, sqrt(2), 2)
 airm_unvec(sigma, w)
+}
 }

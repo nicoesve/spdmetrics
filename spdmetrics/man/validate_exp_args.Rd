@@ -9,7 +9,7 @@ validate_exp_args(sigma, v)
 \arguments{
 \item{sigma}{A dppMatrix object}
 
-\item{lambda}{A dspMatrix object}
+\item{v}{A dspMatrix object}
 }
 \value{
 None

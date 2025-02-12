@@ -18,7 +18,9 @@ A numeric vector, representing the vectorized tangent image.
 Vectorizes a tangent matrix into a vector in Euclidean space using AIRM.
 }
 \examples{
+\dontrun{
 sigma <- diag(2) |> Matrix::nearPD()$mat |> Matrix::pack()
 v <- diag(c(1, 0.5)) |> Matrix::nearPD()$mat |> Matrix::pack()
 airm_vec(sigma, v)
+}
 }

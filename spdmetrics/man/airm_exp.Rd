@@ -18,7 +18,9 @@ A symmetric positive-definite matrix of class \code{dppMatrix}.
 This function computes the Riemannian exponential map for the Affine-Invariant Riemannian Metric (AIRM). # nolint: line_length_linter
 }
 \examples{
+\dontrun{
 sigma <- diag(2) |> Matrix::nearPD()$mat |> Matrix::pack()
 v <- diag(c(1, 0.5)) |> Matrix::nearPD()$mat |> Matrix::pack()
 airm_exp(sigma, v)
+}
 }

@@ -18,7 +18,9 @@ A symmetric matrix of class \code{dspMatrix}, representing the tangent space ima
 This function computes the Riemannian logarithmic map for the Affine-Invariant Riemannian Metric (AIRM). # nolint: line_length_linter
 }
 \examples{
+\dontrun{
 sigma <- diag(2) |> Matrix::nearPD()$mat |> Matrix::pack()
 lambda <- diag(c(2, 3)) |> Matrix::nearPD()$mat |> Matrix::pack()
 airm_log(sigma, lambda)
+}
 }

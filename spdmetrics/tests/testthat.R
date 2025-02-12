@@ -1,4 +1,4 @@
 library(testthat)
-library(RSPD)
+library(spdmetrics)
 
-test_check("RSPD")
+test_check("spdmetrics")

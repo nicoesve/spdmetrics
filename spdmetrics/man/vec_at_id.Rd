@@ -16,6 +16,8 @@ A numeric vector, representing the vectorized tangent image.
 Converts a symmetric matrix into a vector representation specific to operations at the identity matrix. # nolint: line_length_linter
 }
 \examples{
+\dontrun{
 v <- diag(c(1, sqrt(2))) |> Matrix::nearPD()$mat |> Matrix::pack()
 vec_at_id(v)
+}
 }

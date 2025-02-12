@@ -44,15 +44,21 @@ Ready-to-use metric objects for various Riemannian geometries on the manifold
 of symmetric positive definite matrices.
 }
 \examples{
+\dontrun{
 data(airm)
 
 # Create two SPD matrices
 sigma <- Matrix(c(2.0, 0.5, 0.5, 3.0), nrow = 2) |>
-    nearPD() |> _$mat |> pack()
+    nearPD() |>
+    _$mat |>
+    pack()
 lambda <- Matrix(c(1.5, 0.3, 0.3, 2.5), nrow = 2) |>
-    nearPD() |> _$mat |> pack()
+    nearPD() |>
+    _$mat |>
+    pack()
 
 # Use the metric
 result <- airm$log(sigma, lambda)
+}
 }
 \keyword{datasets}

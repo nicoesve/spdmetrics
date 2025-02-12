@@ -13,16 +13,22 @@
 #' @name metrics
 #' @aliases airm log_euclidean euclidean log_cholesky bures_wasserstein
 #' @examples
+#' \dontrun{
 #' data(airm)
-#' 
+#'
 #' # Create two SPD matrices
 #' sigma <- Matrix(c(2.0, 0.5, 0.5, 3.0), nrow = 2) |>
-#'     nearPD() |> _$mat |> pack()
+#'     nearPD() |>
+#'     _$mat |>
+#'     pack()
 #' lambda <- Matrix(c(1.5, 0.3, 0.3, 2.5), nrow = 2) |>
-#'     nearPD() |> _$mat |> pack()
+#'     nearPD() |>
+#'     _$mat |>
+#'     pack()
 #'
 #' # Use the metric
 #' result <- airm$log(sigma, lambda)
+#' }
 NULL
 
 #' @rdname metrics

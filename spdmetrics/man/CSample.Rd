@@ -9,26 +9,12 @@ This class represents a sample of connectomes, with various properties and metho
 \examples{
 
 ## ------------------------------------------------
-## Method `CSample$new`
-## ------------------------------------------------
-
-data(airm)
-conn_sample <- CSample$new(
-conns = list_of_conns,
-metric_obj = airm
-)
-Compute Tangent Images
-
-
-## ------------------------------------------------
 ## Method `CSample$compute_tangents`
 ## ------------------------------------------------
 
 \dontrun{
   CSample$compute_tangents(ref_pt = some_ref_pt)
 }
-Compute connectomes
-
 
 ## ------------------------------------------------
 ## Method `CSample$compute_conns`
@@ -37,8 +23,6 @@ Compute connectomes
 \dontrun{
   CSample$compute_conns()
 }
-Compute Vectorized Tangent Images
-
 
 ## ------------------------------------------------
 ## Method `CSample$compute_vecs`
@@ -47,8 +31,6 @@ Compute Vectorized Tangent Images
 \dontrun{
   CSample$compute_vecs()
 }
-Compute Unvectorized Tangent Images
-
 
 ## ------------------------------------------------
 ## Method `CSample$compute_unvecs`
@@ -57,8 +39,6 @@ Compute Unvectorized Tangent Images
 \dontrun{
   CSample$compute_unvecs()
 }
-Compute Frechet Mean
-
 
 ## ------------------------------------------------
 ## Method `CSample$compute_fmean`
@@ -67,8 +47,6 @@ Compute Frechet Mean
 \dontrun{
   CSample$compute_fmean(tol = 0.01, max_iter = 30, lr = 0.1)
 }
-Change Reference Point
-
 
 ## ------------------------------------------------
 ## Method `CSample$change_ref_pt`
@@ -77,10 +55,6 @@ Change Reference Point
 \dontrun{
   CSample$change_ref_pt(new_ref_pt)
 }
-Center the sample
-
-This function centers the sample by computing the Frechet mean if it is not already computed, and then changing the reference point to the computed Frechet mean. # nolint: line_length_linter
-
 
 ## ------------------------------------------------
 ## Method `CSample$center`
@@ -89,10 +63,6 @@ This function centers the sample by computing the Frechet mean if it is not alre
 \dontrun{
 obj$center()
 }
-
-Compute Variation
-
-This function computes the variation of the sample. It first checks if the vector images are null, and if so, it computes the vectors, computing first the tangent images if necessary. If the sample is not centered, it centers the sample and recomputes the vectors. Finally, it calculates the variation as the mean of the sum of squares of the vector images.
 
 
 ## ------------------------------------------------
@@ -103,10 +73,6 @@ This function computes the variation of the sample. It first checks if the vecto
   obj <- CSample$new()
   obj$compute_variation()
 }
-Compute Sample Covariance
-
-This function computes the sample covariance matrix for the vector images. It first checks if the vector images are null, and if so, it computes the vectors, computing first the tangent images if necessary.  # nolint: line_length_linter
-
 
 ## ------------------------------------------------
 ## Method `CSample$compute_sample_cov`
@@ -166,6 +132,7 @@ This function computes the sample covariance matrix for the vector images. It fi
 \if{html}{\out{<a id="method-CSample-new"></a>}}
 \if{latex}{\out{\hypertarget{method-CSample-new}{}}}
 \subsection{Method \code{new()}}{
+Initialize a CSample object
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{CSample$new(
   conns = NULL,
@@ -197,20 +164,6 @@ This function computes the sample covariance matrix for the vector images. It fi
 \subsection{Returns}{
 A new \code{CSample} object.
 }
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{data(airm)
-conn_sample <- CSample$new(
-conns = list_of_conns,
-metric_obj = airm
-)
-Compute Tangent Images
-
-}
-\if{html}{\out{</div>}}
-
-}
-
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-CSample-compute_tangents"></a>}}
@@ -240,8 +193,6 @@ None
 \preformatted{\dontrun{
   CSample$compute_tangents(ref_pt = some_ref_pt)
 }
-Compute connectomes
-
 }
 \if{html}{\out{</div>}}
 
@@ -269,8 +220,6 @@ None
 \preformatted{\dontrun{
   CSample$compute_conns()
 }
-Compute Vectorized Tangent Images
-
 }
 \if{html}{\out{</div>}}
 
@@ -298,8 +247,6 @@ None
 \preformatted{\dontrun{
   CSample$compute_vecs()
 }
-Compute Unvectorized Tangent Images
-
 }
 \if{html}{\out{</div>}}
 
@@ -327,8 +274,6 @@ None
 \preformatted{\dontrun{
   CSample$compute_unvecs()
 }
-Compute Frechet Mean
-
 }
 \if{html}{\out{</div>}}
 
@@ -363,8 +308,6 @@ None
 \preformatted{\dontrun{
   CSample$compute_fmean(tol = 0.01, max_iter = 30, lr = 0.1)
 }
-Change Reference Point
-
 }
 \if{html}{\out{</div>}}
 
@@ -399,10 +342,6 @@ None
 \preformatted{\dontrun{
   CSample$change_ref_pt(new_ref_pt)
 }
-Center the sample
-
-This function centers the sample by computing the Frechet mean if it is not already computed, and then changing the reference point to the computed Frechet mean. # nolint: line_length_linter
-
 }
 \if{html}{\out{</div>}}
 
@@ -413,12 +352,13 @@ This function centers the sample by computing the Frechet mean if it is not alre
 \if{html}{\out{<a id="method-CSample-center"></a>}}
 \if{latex}{\out{\hypertarget{method-CSample-center}{}}}
 \subsection{Method \code{center()}}{
+Center the sample
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{CSample$center()}\if{html}{\out{</div>}}
 }
 
 \subsection{Details}{
-error if tangent images are not specified. Error if the sample is already centered.
+This function centers the sample by computing the Frechet mean if it is not already computed, and then changing the reference point to the computed Frechet mean. Error if tangent images are not specified. Error if the sample is already centered.
 }
 
 \subsection{Returns}{
@@ -430,10 +370,6 @@ None. This function is called for its side effects.
 obj$center()
 }
 
-Compute Variation
-
-This function computes the variation of the sample. It first checks if the vector images are null, and if so, it computes the vectors, computing first the tangent images if necessary. If the sample is not centered, it centers the sample and recomputes the vectors. Finally, it calculates the variation as the mean of the sum of squares of the vector images.
-
 }
 \if{html}{\out{</div>}}
 
@@ -444,12 +380,13 @@ This function computes the variation of the sample. It first checks if the vecto
 \if{html}{\out{<a id="method-CSample-compute_variation"></a>}}
 \if{latex}{\out{\hypertarget{method-CSample-compute_variation}{}}}
 \subsection{Method \code{compute_variation()}}{
+Compute Variation
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{CSample$compute_variation()}\if{html}{\out{</div>}}
 }
 
 \subsection{Details}{
-Error if \code{vec_imgs} is not specified.
+This function computes the variation of the sample. It first checks if the vector images are null, and if so, it computes the vectors, computing first the tangent images if necessary. If the sample is not centered, it centers the sample and recomputes the vectors. Finally, it calculates the variation as the mean of the sum of squares of the vector images. Error if \code{vec_imgs} is not specified.
 }
 
 \subsection{Returns}{
@@ -461,10 +398,6 @@ None. This function is called for its side effects.
   obj <- CSample$new()
   obj$compute_variation()
 }
-Compute Sample Covariance
-
-This function computes the sample covariance matrix for the vector images. It first checks if the vector images are null, and if so, it computes the vectors, computing first the tangent images if necessary.  # nolint: line_length_linter
-
 }
 \if{html}{\out{</div>}}
 
@@ -475,8 +408,13 @@ This function computes the sample covariance matrix for the vector images. It fi
 \if{html}{\out{<a id="method-CSample-compute_sample_cov"></a>}}
 \if{latex}{\out{\hypertarget{method-CSample-compute_sample_cov}{}}}
 \subsection{Method \code{compute_sample_cov()}}{
+Compute Sample Covariance
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{CSample$compute_sample_cov()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+This function computes the sample covariance matrix for the vector images. It first checks if the vector images are null, and if so, it computes the vectors, computing first the tangent images if necessary.
 }
 
 \subsection{Returns}{

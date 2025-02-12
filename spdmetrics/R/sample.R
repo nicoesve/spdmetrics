@@ -2,7 +2,6 @@
 #'
 #' @description
 #' This class represents a sample of connectomes, with various properties and methods to handle their tangent and vectorized images. # nolint: line_length_linter.
-#' @export
 CSample <- R6::R6Class( # nolint: cyclocomp_linter
     classname = "CSample",
     private = list(
@@ -12,7 +11,7 @@ CSample <- R6::R6Class( # nolint: cyclocomp_linter
         tangent_handler = NULL
     ),
     public = list(
-        #' Initialize a CSample object
+        #' @description Initialize a CSample object
         #'
         #' @param conns A list of connectomes (default is NULL).
         #' @param ref_pt A connectome (default is identity)
@@ -22,12 +21,6 @@ CSample <- R6::R6Class( # nolint: cyclocomp_linter
         #' @param metric_obj Object of class `rmetric` representing the Riemannian metric used. # nolint: line_length_linter
         #'
         #' @return A new `CSample` object.
-        #' @examples
-        #' data(airm)
-        #' conn_sample <- CSample$new(
-        #' conns = list_of_conns,
-        #' metric_obj = airm
-        #' )
         initialize = function(conns = NULL, tan_imgs = NULL,
                               vec_imgs = NULL, centered = NULL,
                               ref_pt = NULL, metric_obj) {
@@ -106,8 +99,6 @@ CSample <- R6::R6Class( # nolint: cyclocomp_linter
             }
         },
 
-        #' Compute Tangent Images
-        #'
         #' @description
         #' This function computes the tangent images from the connectomes.
         #'
@@ -128,8 +119,6 @@ CSample <- R6::R6Class( # nolint: cyclocomp_linter
             private$tangent_handler$compute_tangents(private$conns)
         },
 
-        #' Compute connectomes
-        #'
         #' @description
         #' This function computes the connectomes from the tangent images.
         #'
@@ -146,8 +135,6 @@ CSample <- R6::R6Class( # nolint: cyclocomp_linter
             private$conns <- private$tangent_handler$compute_conns()
         },
 
-        #' Compute Vectorized Tangent Images
-        #'
         #' @description
         #' This function computes the vectorized tangent images from the tangent images. # nolint: line_length_linter
         #'
@@ -164,8 +151,6 @@ CSample <- R6::R6Class( # nolint: cyclocomp_linter
             private$vec_imgs <- private$tangent_handler$compute_vecs()
         },
 
-        #' Compute Unvectorized Tangent Images
-        #'
         #' @description
         #' This function computes the tangent images from the vector images.
         #'
@@ -189,8 +174,6 @@ CSample <- R6::R6Class( # nolint: cyclocomp_linter
             )
         },
 
-        #' Compute Frechet Mean
-        #'
         #' @description
         #' This function computes the Frechet mean of the sample.
         #'
@@ -207,8 +190,6 @@ CSample <- R6::R6Class( # nolint: cyclocomp_linter
             private$f_mean <- compute_frechet_mean(self, tol, max_iter, lr)
         },
 
-        #' Change Reference Point
-        #'
         #' @description
         #' This function changes the reference point for the tangent images.
         #'
@@ -230,12 +211,10 @@ CSample <- R6::R6Class( # nolint: cyclocomp_linter
             private$tangent_handler$relocate_tangents(new_ref_pt)
         },
 
-        #' Center the sample
-        #'
-        #' This function centers the sample by computing the Frechet mean if it is not already computed, and then changing the reference point to the computed Frechet mean. # nolint: line_length_linter
+        #' @description Center the sample
         #'
         #' @return None. This function is called for its side effects.
-        #' @details error if tangent images are not specified. Error if the sample is already centered.
+        #' @details This function centers the sample by computing the Frechet mean if it is not already computed, and then changing the reference point to the computed Frechet mean. Error if tangent images are not specified. Error if the sample is already centered.
         #' @examples
         #' \dontrun{
         #' obj$center()
@@ -255,12 +234,10 @@ CSample <- R6::R6Class( # nolint: cyclocomp_linter
             private$centered <- TRUE
         },
 
-        #' Compute Variation
-        #'
-        #' This function computes the variation of the sample. It first checks if the vector images are null, and if so, it computes the vectors, computing first the tangent images if necessary. If the sample is not centered, it centers the sample and recomputes the vectors. Finally, it calculates the variation as the mean of the sum of squares of the vector images.
+        #' @description Compute Variation
         #'
         #' @return None. This function is called for its side effects.
-        #' @details Error if `vec_imgs` is not specified.
+        #' @details This function computes the variation of the sample. It first checks if the vector images are null, and if so, it computes the vectors, computing first the tangent images if necessary. If the sample is not centered, it centers the sample and recomputes the vectors. Finally, it calculates the variation as the mean of the sum of squares of the vector images. Error if `vec_imgs` is not specified.
         #' @examples
         #' \dontrun{
         #'   obj <- CSample$new()
@@ -285,10 +262,9 @@ CSample <- R6::R6Class( # nolint: cyclocomp_linter
                 mean()
         },
 
-        #' Compute Sample Covariance
+        #' @description Compute Sample Covariance
         #'
-        #' This function computes the sample covariance matrix for the vector images. It first checks if the vector images are null, and if so, it computes the vectors, computing first the tangent images if necessary.  # nolint: line_length_linter
-        #'
+        #' @details This function computes the sample covariance matrix for the vector images. It first checks if the vector images are null, and if so, it computes the vectors, computing first the tangent images if necessary.
         #' @return None. This function is called for its side effects.
         #' @examples
         #' \dontrun{

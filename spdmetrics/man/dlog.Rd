@@ -9,7 +9,7 @@ dlog(sigma, h)
 \arguments{
 \item{sigma}{A symmetric positive definite matrix of class dspMatrix}
 
-\item{H}{A symmetric matrix representing tangent vector of class dsyMatrix}
+\item{h}{A symmetric matrix representing tangent vector of class dsyMatrix}
 }
 \value{
 A symmetric matrix representing the differential evaluated at H of class dsyMatrix # nolint: line_length_linter

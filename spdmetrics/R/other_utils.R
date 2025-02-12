@@ -246,7 +246,7 @@ validate_log_args <- function(sigma, lambda) {
 #' Validate arguments for Riemannian logarithms
 #'
 #' @param sigma A dppMatrix object
-#' @param lambda A dspMatrix object
+#' @param v A dspMatrix object
 #' @details Error if sigma and lambda are not of the same dimensions
 #' @return None
 validate_exp_args <- function(sigma, v) {
@@ -323,7 +323,7 @@ id_matr <- function(sigma) {
 #' Computes the differential of the matrix logarithm map at a point Sigma, evaluated at H # nolint: line_length_linter
 #'
 #' @param sigma A symmetric positive definite matrix of class dspMatrix
-#' @param H A symmetric matrix representing tangent vector of class dsyMatrix
+#' @param h A symmetric matrix representing tangent vector of class dsyMatrix
 #' @return A symmetric matrix representing the differential evaluated at H of class dsyMatrix # nolint: line_length_linter
 #' @export
 dlog <- function(sigma, h) {
