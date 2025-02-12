@@ -107,7 +107,7 @@ compute_frechet_mean <- function(sample, tol = 0.05, max_iter = 20, lr = 0.2) {
         tan_step <- lr * Reduce(`+`, old_tan) /
             aux_sample$sample_size
         tan_step <- tan_step |>
-            methods::as("dsyMatrix") |>
+            Matrix::symmpart() |>
             Matrix::pack()
         new_ref_pt <- aux_sample$riem_metric$exp(old_ref_pt, tan_step)
 
@@ -226,8 +226,8 @@ validate_vec_imgs <- function(vec_imgs, centered) {
 #' @return None
 validate_log_args <- function(sigma, lambda) {
     inheritance_flag <- list(sigma, lambda) |>
-        purrr::map(\(x) inherits(x, "dppMatrix")) |>
-        all()
+        purrr::map_lgl(\(x) inherits(x, "dppMatrix")) #|>
+    inheritance_flag <- inheritance_flag |> all()
 
     if (!inheritance_flag) {
         stop("Both arguments should be of class dppMatrx")
@@ -235,7 +235,8 @@ validate_log_args <- function(sigma, lambda) {
 
     dim_flag <- list(sigma, lambda) |>
         purrr::map(\(x) x@Dim) |>
-        (\(l) identical(l[[1]], l[[2]]))()
+        (\(l) identical(l[[1]], l[[2]]))() #|>
+    # dim_flag <- dim_flag |> all()
 
     if (!dim_flag) {
         stop("Arguments should be matrices of the same dimension")
@@ -261,7 +262,8 @@ validate_exp_args <- function(sigma, v) {
 
     dim_flag <- list(sigma, v) |>
         purrr::map(\(x) x@Dim) |>
-        (\(l) identical(l[[1]], l[[2]]))()
+        (\(l) identical(l[[1]], l[[2]]))() |>
+        all()
 
     if (!dim_flag) {
         stop("Arguments should be matrices of the same dimension")
@@ -390,6 +392,7 @@ dexp <- function(a, x) {
 #' @param x A matrix
 #' @return Its matrix logarithm
 safe_logm <- function(x) {
+    x <- as.matrix(x)
     tryCatch(
         expm::logm(x, method = "Eigen"),
         error = function(e) {
@@ -417,7 +420,7 @@ half_underscore <- function(x) {
     lower_tri <- Matrix::tril(x, -1)
     diag_part <- Matrix::diag(x) / 2
     result <- lower_tri + Matrix::Diagonal(x = diag_part)
-    result |>
-        Matrix::symmpart() |>
-        Matrix::pack()
+    result #|>
+    # Matrix::symmpart() |>
+    # Matrix::pack()
 }

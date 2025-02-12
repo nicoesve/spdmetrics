@@ -2,19 +2,19 @@
 #'
 #' This function computes the Riemannian logarithmic map using the Log-Cholesky metric for symmetric positive-definite matrices. The Log-Cholesky metric operates by transforming matrices via their Cholesky decomposition.
 #'
-#' @param ref_pt A symmetric positive-definite matrix of class `dppMatrix`, representing the reference point.
-#' @param mfd_pt A symmetric positive-definite matrix of class `dppMatrix`, representing the target point.
+#' @param sigma A symmetric positive-definite matrix of class `dppMatrix`, representing the reference point.
+#' @param lambda A symmetric positive-definite matrix of class `dppMatrix`, representing the target point.
 #'
-#' @return A symmetric matrix of class `dspMatrix`, representing the tangent space image of `mfd_pt` at `ref_pt`.
+#' @return A symmetric matrix of class `dspMatrix`, representing the tangent space image of `lambda` at `sigma`.
 #' @export
-log_cholesky_log <- function(ref_pt, mfd_pt) {
-    validate_log_args(ref_pt, mfd_pt)
+log_cholesky_log <- function(sigma, lambda) {
+    validate_log_args(sigma, lambda)
 
     # Compute Cholesky decompositions - get lower triangular factors
-    l_ref <- ref_pt |>
+    l_ref <- sigma |>
         chol() |>
         t()
-    l_mfd <- mfd_pt |>
+    l_mfd <- lambda |>
         chol() |>
         t()
 
@@ -37,22 +37,22 @@ log_cholesky_log <- function(ref_pt, mfd_pt) {
 #'
 #' This function computes the Riemannian exponential map using the Log-Cholesky metric for symmetric positive-definite matrices. The map operates by transforming the tangent vector via Cholesky decomposition of the reference point.
 #'
-#' @param ref_pt A symmetric positive-definite matrix of class `dppMatrix`, representing the reference point.
-#' @param tangent A symmetric matrix of class `dspMatrix`, representing the tangent vector to be mapped.
+#' @param sigma A symmetric positive-definite matrix of class `dppMatrix`, representing the reference point.
+#' @param v A symmetric matrix of class `dspMatrix`, representing the tangent vector to be mapped.
 #'
 #' @return A symmetric positive-definite matrix of class `dppMatrix`, representing the point on the manifold.
 #' @export
-log_cholesky_exp <- function(ref_pt, tangent) {
-    validate_exp_args(ref_pt, tangent)
+log_cholesky_exp <- function(sigma, v) {
+    validate_exp_args(sigma, v)
 
     # Compute Cholesky decomposition - get lower triangular factor
-    l_ref <- ref_pt |>
+    l_ref <- sigma |>
         chol() |>
         t()
 
     # Transform tangent vector to Cholesky space
     l_inv <- solve(l_ref)
-    temp <- l_inv %*% tangent %*% t(l_inv)
+    temp <- l_inv %*% v %*% t(l_inv)
     temp_under_half <- temp |> half_underscore()
     x_l <- l_ref %*% temp_under_half
     x_l <- Matrix::tril(x_l)
@@ -82,29 +82,20 @@ log_cholesky_exp <- function(ref_pt, tangent) {
 spd_isometry_to_identity <- function(sigma, v) {
     validate_vec_args(sigma, v)
 
-    # Cholesky decomposition
-    l_sigma <- sigma |>
+    l_ref <- sigma |>
         chol() |>
         t()
-    l_inv <- solve(l_sigma)
+    lchol_inv <- l_ref |> (\(x) (1 / diag(x)) - Matrix::tril(x, -1))()
 
-    # Transform to Cholesky space
-    x <- l_inv %*% v %*% t(l_inv)
-    x_sym <- Matrix::symmpart(x)
+    l_inv <- solve(l_ref)
+    temp <- l_inv %*% v %*% t(l_inv)
+    temp_under_half <- temp |> half_underscore()
+    x_l <- l_ref %*% temp_under_half
 
-    # Split into parts and apply isometry
-    x_lower <- x_sym * Matrix::tril(matrix(1, nrow(x), ncol(x)), -1)
-    x_diag <- diag(x_sym)
+    tan_version <- Matrix::tril(x_l, -1)
+    diag(tan_version) <- diag(lchol_inv) * diag(x_l)
 
-    y_lower <- x_lower
-    y_diag <- x_diag / diag(l_sigma)
-
-    # Reconstruct symmetric matrix
-    y <- Matrix::Matrix(0, nrow(x), ncol(x))
-    y[lower.tri(y, diag = FALSE)] <- y_lower[lower.tri(y, diag = FALSE)]
-    diag(y) <- y_diag
-
-    y |>
+    (2 * tan_version) |>
         Matrix::symmpart() |>
         Matrix::pack()
 }
@@ -133,28 +124,16 @@ spd_isometry_from_identity <- function(sigma, v) {
     validate_vec_args(sigma, v)
 
     # Get Cholesky decomposition
-    l_sigma <- sigma |>
+    l_ref <- sigma |>
         chol() |>
         t()
 
-    # Split input matrix
-    v_sym <- Matrix::symmpart(v)
-    v_lower <- v_sym * Matrix::tril(matrix(1, nrow(v), ncol(v)), -1)
-    v_diag <- diag(v_sym)
+    x_l <- half_underscore(v)
+    tan_version <- Matrix::tril(x_l, -1)
+    diag(tan_version) <- diag(l_ref) * diag(x_l)
 
-    # Reverse the isometry
-    x_lower <- v_lower
-    x_diag <- v_diag * diag(l_sigma)
-
-    # Reconstruct matrix
-    x <- Matrix::Matrix(0, nrow(v), ncol(v))
-    x[lower.tri(x, diag = FALSE)] <- x_lower[lower.tri(x, diag = FALSE)]
-    diag(x) <- x_diag
-
-    # Transform back using Cholesky
-    x |>
-        Matrix::symmpart() |>
-        (\(mat) l_sigma %*% mat %*% t(l_sigma))() |>
+    aux <- l_ref %*% t(tan_version) + tan_version %*% t(l_ref)
+    aux |>
         Matrix::symmpart() |>
         Matrix::pack()
 }
@@ -177,10 +156,9 @@ log_cholesky_unvec <- function(sigma, w) {
 
     # Create matrix and reverse isometry
     methods::new(
-        "dsyMatrix",
+        "dspMatrix",
         x = w_scaled,
         Dim = as.integer(c(sigma@Dim[1], sigma@Dim[1]))
     ) |>
-        Matrix::pack() |>
         spd_isometry_from_identity(sigma = sigma, v = _)
 }

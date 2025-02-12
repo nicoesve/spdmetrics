@@ -19,15 +19,15 @@ solve_lyapunov <- function(p, v) {
     # Convert to standard matrices for kronecker operation
     p_dense <- as.matrix(p)
     v_dense <- as.matrix(v)
-    
+
     # Construct system matrix and right-hand side
     a <- kronecker(diag(n), p_dense) + kronecker(p_dense, diag(n))
     b <- as.vector(v_dense)
-    
+
     # Solve system and reshape solution
     l_vec <- solve(a, b)
     l_mat <- matrix(l_vec, nrow = n, ncol = n)
-    
+
     # Convert back to Matrix package format and ensure symmetry
     l_mat |>
         Matrix::Matrix(sparse = FALSE) |>
@@ -41,25 +41,25 @@ solve_lyapunov <- function(p, v) {
 #' metric for symmetric positive-definite matrices. The map operates by solving
 #' a Lyapunov equation and then constructing the exponential.
 #'
-#' @param sigma A symmetric positive-definite matrix of class `dppMatrix`, representing 
+#' @param sigma A symmetric positive-definite matrix of class `dppMatrix`, representing
 #'        the reference point.
-#' @param v A symmetric matrix of class `dspMatrix`, representing the tangent vector 
+#' @param v A symmetric matrix of class `dspMatrix`, representing the tangent vector
 #'        to be mapped.
 #'
-#' @return A symmetric positive-definite matrix of class `dppMatrix`, representing the 
+#' @return A symmetric positive-definite matrix of class `dppMatrix`, representing the
 #'         point on the manifold.
 #' @export
 bures_wasserstein_exp <- function(sigma, v) {
     validate_exp_args(sigma, v)
-    
+
     # Solve Lyapunov equation
-    l <- solve_lyapunov(sigma, v)
-    
+    # l <- solve_lyapunov(sigma, v)
+
     # Compute exponential map
     n <- sigma@Dim[1]
     id_mat <- Matrix::Diagonal(n)
-    
-    ((id_mat + l) %*% sigma %*% (id_mat + l)) |>
+
+    ((id_mat + v) %*% sigma %*% (id_mat + v)) |>
         Matrix::nearPD() |>
         _$mat |>
         Matrix::pack()
@@ -70,29 +70,30 @@ bures_wasserstein_exp <- function(sigma, v) {
 #' This function computes the Riemannian logarithmic map using the Bures-Wasserstein
 #' metric for symmetric positive-definite matrices.
 #'
-#' @param sigma A symmetric positive-definite matrix of class `dppMatrix`, representing 
+#' @param sigma A symmetric positive-definite matrix of class `dppMatrix`, representing
 #'        the reference point.
-#' @param lambda A symmetric positive-definite matrix of class `dppMatrix`, representing 
+#' @param lambda A symmetric positive-definite matrix of class `dppMatrix`, representing
 #'        the target point.
 #'
-#' @return A symmetric matrix of class `dspMatrix`, representing the tangent space image 
+#' @return A symmetric matrix of class `dspMatrix`, representing the tangent space image
 #'         of `lambda` at `sigma`.
 #' @export
 bures_wasserstein_log <- function(sigma, lambda) {
     validate_log_args(sigma, lambda)
-    
-    # Compute square roots and their inverse
+
+    # # Compute square roots and their inverse
     sigma_sqrt <- expm::sqrtm(sigma) |>
         Matrix::nearPD() |>
         _$mat
     sigma_sqrt_inv <- solve(sigma_sqrt)
-    
-    # Compute intermediate terms
-    intermediate <- sigma_sqrt_inv %*% lambda %*% sigma_sqrt_inv
+
+    # # Compute intermediate terms
+    intermediate <- sigma_sqrt %*% lambda %*% sigma_sqrt
     intermediate_sqrt <- expm::sqrtm(intermediate)
-    
+    aux <- sigma_sqrt_inv %*% intermediate_sqrt %*% sigma_sqrt_inv
+
     # Compute the logarithm
-    ((intermediate_sqrt - diag(nrow(sigma))) %*% sigma) |>
+    (aux - diag(nrow(sigma))) |>
         Matrix::symmpart() |>
         Matrix::pack()
 }
@@ -102,7 +103,7 @@ bures_wasserstein_log <- function(sigma, lambda) {
 #' @param sigma A symmetric positive-definite matrix of class `dppMatrix`
 #' @param v A symmetric matrix of class `dspMatrix`
 #' @return A numeric vector representing the vectorized tangent image
-#' @export 
+#' @export
 bures_wasserstein_vec <- function(sigma, v) {
     # For now, use same vectorization as AIRM
     airm_vec(sigma, v)
