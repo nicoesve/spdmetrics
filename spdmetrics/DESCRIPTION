@@ -1,21 +1,25 @@
 Package: spdmetrics
 Title: Riemannian Metrics for Symmetric Positive Definite Matrices
 Version: 0.1.0
-Authors@R: 
-    person(given = "Nicolas",
-           family = "Escobar",
-           role = c("aut", "cre"),
-           email = "nescoba@iu.edu"),
-           comment = c(ORCID = "0009-0006-0800-5692")
-    person(given = "Jaroslaw",
-           family = "Harezlak",
-           role = "ths")
+Authors@R: c(
+    person(
+        given = "Nicolas",
+        family = "Escobar",
+        role = c("aut", "cre"),
+        email = "nescoba@iu.edu",
+        comment = c(ORCID = "0009-0006-0800-5692")
+    ),
+    person(
+        given = "Jaroslaw",
+        family = "Harezlak",
+        role = "ths"
+    ))
 Description: Implements various Riemannian metrics for symmetric positive definite matrices, including AIRM (Affine Invariant Riemannian Metric), Log-Euclidean, Euclidean, Log-Cholesky, and Bures-Wasserstein metrics. Provides functions for computing logarithmic and exponential maps, vectorization, and statistical operations on the manifold of positive definite matrices.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2
 Depends: R (>= 4.1.0)
 Imports: 
     Matrix,

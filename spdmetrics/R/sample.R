@@ -2,19 +2,6 @@
 #'
 #' @description
 #' This class represents a sample of connectomes, with various properties and methods to handle their tangent and vectorized images. # nolint: line_length_linter.
-#'
-#' @field conns A list of connectomes.
-#' @field vec_imgs A matrix whose rows are the vectorized images.
-#' @field n Number of connectomes.
-#' @field p Number of rows (equivalently, of columns) in each connectome.
-#' @field d Dimensionality of the tangent space of connectomes.
-#' @field centered Whether the data is centered.
-#' @field f_mean Frechet mean of the sample.
-#' @field metric_obj Riemannian metric used.
-#' @field var Variation of the data.
-#' @field s_cov Sample covariance of the data.
-#' @field tangent_handler Handler for tangent images.
-#'
 #' @export
 CSample <- R6::R6Class( # nolint: cyclocomp_linter
     classname = "CSample",
@@ -41,6 +28,7 @@ CSample <- R6::R6Class( # nolint: cyclocomp_linter
         #' conns = list_of_conns,
         #' metric_obj = airm
         #' )
+        #' @export
         initialize = function(conns = NULL, tan_imgs = NULL,
                               vec_imgs = NULL, centered = NULL,
                               ref_pt = NULL, metric_obj) {
@@ -127,7 +115,7 @@ CSample <- R6::R6Class( # nolint: cyclocomp_linter
         #' @param ref_pt A reference point, which must be a `dppMatrix` object (default is `default_ref_pt`). # nolint: line_length_linter
         #'
         #' @return None
-        #' @throws Error if `ref_pt` is not a `dppMatrix` object or if `conns` is not specified. # nolint: line_length_linter
+        #' @details Error if `ref_pt` is not a `dppMatrix` object or if `conns` is not specified. # nolint: line_length_linter
         #' @examples
         #' \dontrun{
         #'   CSample$compute_tangents(ref_pt = some_ref_pt)
@@ -147,7 +135,7 @@ CSample <- R6::R6Class( # nolint: cyclocomp_linter
         #' This function computes the connectomes from the tangent images.
         #'
         #' @return None
-        #' @throws Error if tangent images are not specified.
+        #' @details Error if tangent images are not specified.
         #' @examples
         #' \dontrun{
         #'   CSample$compute_conns()
@@ -165,7 +153,7 @@ CSample <- R6::R6Class( # nolint: cyclocomp_linter
         #' This function computes the vectorized tangent images from the tangent images. # nolint: line_length_linter
         #'
         #' @return None
-        #' @throws Error if tangent images are not specified.
+        #' @details Error if tangent images are not specified.
         #' @examples
         #' \dontrun{
         #'   CSample$compute_vecs()
@@ -183,7 +171,7 @@ CSample <- R6::R6Class( # nolint: cyclocomp_linter
         #' This function computes the tangent images from the vector images.
         #'
         #' @return None
-        #' @throws Error if `vec_imgs` is not specified.
+        #' @details Error if `vec_imgs` is not specified.
         #' @examples
         #' \dontrun{
         #'   CSample$compute_unvecs()
@@ -228,7 +216,7 @@ CSample <- R6::R6Class( # nolint: cyclocomp_linter
         #' @param new_ref_pt A new reference point, which must be a `dppMatrix` object. # nolint: line_length_linter
         #'
         #' @return None
-        #' @throws Error if tangent images have not been computed or if `new_ref_pt` is not a `dppMatrix` object. # nolint: line_length_linter
+        #' @details Error if tangent images have not been computed or if `new_ref_pt` is not a `dppMatrix` object. # nolint: line_length_linter
         #' @examples
         #' \dontrun{
         #'   CSample$change_ref_pt(new_ref_pt)
@@ -248,8 +236,7 @@ CSample <- R6::R6Class( # nolint: cyclocomp_linter
         #' This function centers the sample by computing the Frechet mean if it is not already computed, and then changing the reference point to the computed Frechet mean. # nolint: line_length_linter
         #'
         #' @return None. This function is called for its side effects.
-        #' @throws error if tangent images are not specified.
-        #' @throws error if the sample is already centered.
+        #' @details error if tangent images are not specified. Error if the sample is already centered.
         #' @examples
         #' \dontrun{
         #' obj$center()
@@ -274,7 +261,7 @@ CSample <- R6::R6Class( # nolint: cyclocomp_linter
         #' This function computes the variation of the sample. It first checks if the vector images are null, and if so, it computes the vectors, computing first the tangent images if necessary. If the sample is not centered, it centers the sample and recomputes the vectors. Finally, it calculates the variation as the mean of the sum of squares of the vector images.
         #'
         #' @return None. This function is called for its side effects.
-        #' @throws Error if `vec_imgs` is not specified.
+        #' @details Error if `vec_imgs` is not specified.
         #' @examples
         #' \dontrun{
         #'   obj <- CSample$new()
@@ -354,7 +341,7 @@ CSample <- R6::R6Class( # nolint: cyclocomp_linter
         #' @field sample_cov Sample covariance
         sample_cov = function() private$s_cov,
 
-        #' @field ref_pt Reference point for tangent or vectorized images
+        #' @field ref_point Reference point for tangent or vectorized images
         ref_point = function() private$tangent_handler$ref_point
     )
 )

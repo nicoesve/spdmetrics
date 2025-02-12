@@ -222,7 +222,7 @@ validate_vec_imgs <- function(vec_imgs, centered) {
 #'
 #' @param sigma A dppMatrix object
 #' @param lambda A dppMatrix object
-#' @throws Error if sigma and lambda are not of the same dimensions
+#' @details Error if sigma and lambda are not of the same dimensions
 #' @return None
 validate_log_args <- function(sigma, lambda) {
     inheritance_flag <- list(sigma, lambda) |>
@@ -247,7 +247,7 @@ validate_log_args <- function(sigma, lambda) {
 #'
 #' @param sigma A dppMatrix object
 #' @param lambda A dspMatrix object
-#' @throws Error if sigma and lambda are not of the same dimensions
+#' @details Error if sigma and lambda are not of the same dimensions
 #' @return None
 validate_exp_args <- function(sigma, v) {
     inheritance_flag <- c(
@@ -274,7 +274,7 @@ validate_exp_args <- function(sigma, v) {
 #'
 #' @param sigma A dppMatrix object
 #' @param v A dspMatrix object
-#' @throws Error if sigma and v are not of the same dimensions
+#' @details Error if sigma and v are not of the same dimensions
 #' @return None
 validate_vec_args <- function(sigma, v) {
     validate_exp_args(sigma, v)
@@ -284,7 +284,7 @@ validate_vec_args <- function(sigma, v) {
 #'
 #' @param sigma A dppMatrix object
 #' @param w A numeric vector
-#' @throws Error if the dimensionalities don't match
+#' @details Error if the dimensionalities don't match
 #' @return None
 validate_unvec_args <- function(sigma, w) {
     inheritance_flag <- c(

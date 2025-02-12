@@ -1,4 +1,11 @@
-source("airm.R", "log-euclidean.R", "euclidean.R", "log-cholesky.R", "bures-wasserstein.R")
+source("R/airm.R")
+source("R/log_euclidean.R")
+source("R/euclidean.R")
+source("R/log_cholesky.R")
+source("R/bures-wasserstein.R")
+source("R/other_utils.R")
+source("R/tangent_handler.R")
+source("R/sample.R")
 
 # Create the metrics objects
 airm <- metric(
@@ -37,5 +44,7 @@ bures_wasserstein <- metric(
 )
 
 # Save the metrics as package data
-usethis::use_data(airm, log_euclidean, euclidean, log_cholesky, 
-                  bures_wasserstein, internal = FALSE, overwrite = TRUE)
+usethis::use_data(airm, log_euclidean, euclidean, log_cholesky,
+    bures_wasserstein,
+    internal = FALSE, overwrite = TRUE
+)
