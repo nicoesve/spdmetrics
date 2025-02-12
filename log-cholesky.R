@@ -1,16 +1,11 @@
 #' Compute the Log-Cholesky Logarithm
 #'
-#' This function computes the Riemannian logarithmic map using the Log-Cholesky metric for
-#' symmetric positive-definite matrices. The Log-Cholesky metric operates by transforming
-#' matrices via their Cholesky decomposition.
+#' This function computes the Riemannian logarithmic map using the Log-Cholesky metric for symmetric positive-definite matrices. The Log-Cholesky metric operates by transforming matrices via their Cholesky decomposition.
 #'
-#' @param ref_pt A symmetric positive-definite matrix of class `dppMatrix`, representing
-#'        the reference point.
-#' @param mfd_pt A symmetric positive-definite matrix of class `dppMatrix`, representing
-#'        the target point.
+#' @param ref_pt A symmetric positive-definite matrix of class `dppMatrix`, representing the reference point.
+#' @param mfd_pt A symmetric positive-definite matrix of class `dppMatrix`, representing the target point.
 #'
-#' @return A symmetric matrix of class `dspMatrix`, representing the tangent space image
-#'         of `mfd_pt` at `ref_pt`.
+#' @return A symmetric matrix of class `dspMatrix`, representing the tangent space image of `mfd_pt` at `ref_pt`.
 #' @export
 log_cholesky_log <- function(ref_pt, mfd_pt) {
     validate_log_args(ref_pt, mfd_pt)
@@ -32,24 +27,20 @@ log_cholesky_log <- function(ref_pt, mfd_pt) {
     diag(lower_diff) <- diag_terms
 
     # Project to SPD tangent space and return
-    (l_ref %*% lower_diff %*% t(l_ref)) |>
+    result <- l_ref %*% t(lower_diff) + lower_diff %*% t(l_ref)
+    result |>
         Matrix::symmpart() |>
         Matrix::pack()
 }
 
 #' Compute the Log-Cholesky Exponential
 #'
-#' This function computes the Riemannian exponential map using the Log-Cholesky metric for
-#' symmetric positive-definite matrices. The map operates by transforming the tangent vector
-#' via Cholesky decomposition of the reference point.
+#' This function computes the Riemannian exponential map using the Log-Cholesky metric for symmetric positive-definite matrices. The map operates by transforming the tangent vector via Cholesky decomposition of the reference point.
 #'
-#' @param ref_pt A symmetric positive-definite matrix of class `dppMatrix`, representing
-#'        the reference point.
-#' @param tangent A symmetric matrix of class `dspMatrix`, representing the tangent vector
-#'        to be mapped.
+#' @param ref_pt A symmetric positive-definite matrix of class `dppMatrix`, representing the reference point.
+#' @param tangent A symmetric matrix of class `dspMatrix`, representing the tangent vector to be mapped.
 #'
-#' @return A symmetric positive-definite matrix of class `dppMatrix`, representing the
-#'         point on the manifold.
+#' @return A symmetric positive-definite matrix of class `dppMatrix`, representing the point on the manifold.
 #' @export
 log_cholesky_exp <- function(ref_pt, tangent) {
     validate_exp_args(ref_pt, tangent)
@@ -62,32 +53,24 @@ log_cholesky_exp <- function(ref_pt, tangent) {
     # Transform tangent vector to Cholesky space
     l_inv <- solve(l_ref)
     temp <- l_inv %*% tangent %*% t(l_inv)
-    # temp_sqrt <- expm::sqrtm(Matrix::symmpart(temp))
-    temp_sqrt <- temp |>
-        Matrix::nearPD() |>
-        _$mat |>
-        as.matrix() |>
-        expm::sqrtm() |>
-        Matrix::symmpart() |>
-        Matrix::pack()
-    # temp_sqrt <- temp_sqrt |>
-    #     Matrix::nearPD() |>
-    #     _$mat |>
-    #     Matrix::pack()
+    temp_under_half <- temp |> half_underscore()
+    x_l <- l_ref %*% temp_under_half
+    x_l <- Matrix::tril(x_l)
 
-    # Compute new Cholesky factor
-    x_l <- l_ref %*% temp_sqrt
-    diag_x <- diag(x_l)
+    # Compute off-diagonal difference and diagonal terms
+    lower_sum <- x_l + l_ref
+    diag_ratio <- diag(x_l) / diag(l_ref)
+    diag_terms <- diag(l_ref) * exp(diag_ratio)
 
-    # Create new lower triangular matrix
-    new_l <- x_l
-    diag(new_l) <- diag(l_ref) * exp(diag_x / diag(l_ref))
+    # Set diagonal terms
+    diag(lower_sum) <- diag_terms
 
     # Return SPD matrix
-    (new_l %*% t(new_l)) |>
+    aux <- (lower_sum %*% t(lower_sum))
+    aux_2 <- aux |>
         Matrix::nearPD() |>
-        _$mat |>
-        Matrix::pack()
+        _$mat
+    aux_2 |> Matrix::pack()
 }
 
 #' Isometry from tangent space at P to tangent space at identity

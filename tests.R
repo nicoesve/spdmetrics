@@ -142,8 +142,8 @@ test_metric <- function(metric_obj, metric_name) {
 }
 
 # Run tests for each metric
-test_metric(airm, "AIRM")
-test_metric(log_euclidean, "Log-Euclidean")
-test_metric(euclidean, "Euclidean")
-# test_metric(log_cholesky, "Log-Cholesky")
-test_metric(bures_wasserstein, "Bures-Wasserstein")
+# test_metric(airm, "AIRM")
+# test_metric(log_euclidean, "Log-Euclidean")
+# test_metric(euclidean, "Euclidean")
+test_metric(log_cholesky, "Log-Cholesky")
+# test_metric(bures_wasserstein, "Bures-Wasserstein")

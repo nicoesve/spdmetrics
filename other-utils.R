@@ -408,3 +408,16 @@ default_ref_pt <- function(p) {
         methods::as("dpoMatrix") |>
         Matrix::pack()
 }
+
+#' Half-underscore operation for use in the log-Cholesky metric
+#'
+#' @param x A symmetric matrix (object of class dsyMatrix)
+#' @return The strictly lower triangular part of the matrix, plus half its diagonal part #nolint: line_length_linter
+half_underscore <- function(x) {
+    lower_tri <- Matrix::tril(x, -1)
+    diag_part <- Matrix::diag(x) / 2
+    result <- lower_tri + Matrix::Diagonal(x = diag_part)
+    result |>
+        Matrix::symmpart() |>
+        Matrix::pack()
+}
