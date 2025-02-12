@@ -4,13 +4,13 @@
 #' This class represents a sample of connectomes, with various properties and methods to handle their tangent and vectorized images. # nolint: line_length_linter.
 #'
 #' @field conns A list of connectomes.
-#' @field vec_imgs A list of vector images.
+#' @field vec_imgs A matrix whose rows are the vectorized images.
 #' @field n Number of connectomes.
 #' @field p Number of rows (equivalently, of columns) in each connectome.
 #' @field d Dimensionality of the tangent space of connectomes.
 #' @field centered Whether the data is centered.
 #' @field f_mean Frechet mean of the sample.
-#' @field metric Riemannian metric used.
+#' @field metric_obj Riemannian metric used.
 #' @field var Variation of the data.
 #' @field s_cov Sample covariance of the data.
 #' @field tangent_handler Handler for tangent images.
@@ -21,31 +21,33 @@ CSample <- R6::R6Class( # nolint: cyclocomp_linter
     private = list(
         conns = NULL, vec_imgs = NULL,
         n = NULL, p = NULL, d = NULL, centered = NULL,
-        f_mean = NULL, metric = NULL, var = NULL, s_cov = NULL,
+        f_mean = NULL, metric_obj = NULL, var = NULL, s_cov = NULL,
         tangent_handler = NULL
     ),
     public = list(
         #' Initialize a CSample object
         #'
         #' @param conns A list of connectomes (default is NULL).
+        #' @param ref_pt A connectome (default is identity)
         #' @param tan_imgs A list of tangent images (default is NULL).
-        #' @param vec_imgs A list of vectorized images (default is NULL).
+        #' @param vec_imgs A matrix whose rows are vectorized images (default is NULL). # nolint: line_length_linter
         #' @param centered Boolean indicating whether tangent or vectorized images are centered (default is NULL). # nolint: line_length_linter
-        #' @param metric Object of class `rmetric` representing the Riemannian metric used. # nolint: line_length_linter
+        #' @param metric_obj Object of class `rmetric` representing the Riemannian metric used. # nolint: line_length_linter
         #'
         #' @return A new `CSample` object.
         #' @examples
         #' data(airm)
         #' conn_sample <- CSample$new(
         #' conns = list_of_conns,
-        #' metric = airm
+        #' metric_obj = airm
         #' )
         initialize = function(conns = NULL, tan_imgs = NULL,
-                              vec_imgs = NULL, centered = NULL, metric) {
+                              vec_imgs = NULL, centered = NULL,
+                              ref_pt = NULL, metric_obj) {
             # Validate and set the metric
-            validate_metric(metric)
-            private$metric <- metric
-            private$tangent_handler <- TangentImageHandler$new(metric)
+            validate_metric(metric_obj)
+            private$metric_obj <- metric_obj
+            private$tangent_handler <- TangentImageHandler$new(metric_obj)
 
             # If connectomes are provided
             if (!is.null(conns)) {
@@ -70,10 +72,10 @@ CSample <- R6::R6Class( # nolint: cyclocomp_linter
                 validate_tan_imgs(tan_imgs, vec_imgs, centered)
 
                 # Set dimensions and initialize properties
-                n <- length(tan_imgs[[2]])
-                p <- nrow(tan_imgs[[1]])
+                n <- length(tan_imgs)
+                p <- nrow(ref_pt)
                 d <- p * (p + 1) / 2
-                frechet_mean <- if (centered) tan_imgs[[1]] else NULL
+                frechet_mean <- if (centered) ref_pt else NULL
                 private$conns <- NULL
                 private$vec_imgs <- NULL
                 private$n <- n
@@ -86,7 +88,7 @@ CSample <- R6::R6Class( # nolint: cyclocomp_linter
 
                 # Set tangent images in the handler
                 private$tangent_handler$set_tangent_images(
-                    tan_imgs[[1]], tan_imgs[[2]]
+                    ref_pt, tan_imgs
                 )
 
                 # If vector images are provided
@@ -94,15 +96,15 @@ CSample <- R6::R6Class( # nolint: cyclocomp_linter
                 validate_vec_imgs(vec_imgs, centered)
 
                 # Set dimensions and initialize properties
-                n <- nrow(vec_imgs[[2]])
-                p <- nrow(vec_imgs[[1]])
+                n <- nrow(vec_imgs)
+                p <- nrow(private$tangent_handler$ref_point)
                 d <- p * (p + 1) / 2
 
                 # Check if dimensions match
-                dims_flag <- d == (vec_imgs[[2]] |> ncol())
+                dims_flag <- d == (vec_imgs |> ncol())
                 if (!dims_flag) stop("Dimensions don't match")
 
-                frechet_mean <- if (centered) vec_imgs[[1]] else NULL
+                frechet_mean <- if (centered) ref_pt else NULL
 
                 private$conns <- NULL
                 private$vec_imgs <- vec_imgs
@@ -113,12 +115,8 @@ CSample <- R6::R6Class( # nolint: cyclocomp_linter
                 private$f_mean <- frechet_mean
                 private$var <- NULL
                 private$s_cov <- NULL
+                private$tangent_handler$set_reference_point(ref_pt)
             }
-
-            # Set default reference point
-            default_ref_pt <- diag(p) |>
-                methods::as("dpoMatrix") |>
-                Matrix::pack()
         },
 
         #' Compute Tangent Images
@@ -134,7 +132,7 @@ CSample <- R6::R6Class( # nolint: cyclocomp_linter
         #' \dontrun{
         #'   CSample$compute_tangents(ref_pt = some_ref_pt)
         #' }
-        compute_tangents = function(ref_pt = default_ref_pt) {
+        compute_tangents = function(ref_pt = default_ref_pt(private$p)) {
             if (!inherits(ref_pt, "dppMatrix")) {
                 stop("ref_pt must be a dppMatrix object.")
             }
@@ -193,12 +191,12 @@ CSample <- R6::R6Class( # nolint: cyclocomp_linter
         compute_unvecs = function() {
             if (is.null(private$vec_imgs)) stop("vec_imgs must be specified.")
             private$tangent_handler$set_tangent_images(
-                private$vec_imgs[[1]],
-                1:nrow(private$vec_imgs[[2]]) |> # nolint: seq_linter
+                private$tangent_handler$ref_point,
+                1:nrow(private$vec_imgs) |> # nolint: seq_linter
                     purrr::map(\(i) {
-                        private$metric$unvec(
-                            private$vec_imgs[[1]],
-                            private$vec_imgs[[2]][i, ]
+                        private$metric_obj$unvec(
+                            private$tangent_handler$ref_point,
+                            private$vec_imgs[i, ]
                         )
                     })
             )
@@ -219,7 +217,7 @@ CSample <- R6::R6Class( # nolint: cyclocomp_linter
         #'   CSample$compute_fmean(tol = 0.01, max_iter = 30, lr = 0.1)
         #' }
         compute_fmean = function(tol = 0.05, max_iter = 20, lr = 0.2) {
-            compute_fmean(self, tol, max_iter, lr)
+            private$f_mean <- compute_frechet_mean(self, tol, max_iter, lr)
         },
 
         #' Change Reference Point
@@ -256,6 +254,32 @@ CSample <- R6::R6Class( # nolint: cyclocomp_linter
         #' \dontrun{
         #' obj$center()
         #' }
+        #'
+        center = function() {
+            if (is.null(private$tangent_handler$tangent_images)) {
+                stop("Tangent images must be specified.")
+            }
+            if (!is.null(private$centered) && private$centered) {
+                stop("The sample is already centered.")
+            }
+            if (is.null(private$f_mean)) {
+                self$compute_fmean()
+            }
+            self$change_ref_pt(private$f_mean)
+            private$centered <- TRUE
+        },
+
+        #' Compute Variation
+        #'
+        #' This function computes the variation of the sample. It first checks if the vector images are null, and if so, it computes the vectors, computing first the tangent images if necessary. If the sample is not centered, it centers the sample and recomputes the vectors. Finally, it calculates the variation as the mean of the sum of squares of the vector images.
+        #'
+        #' @return None. This function is called for its side effects.
+        #' @throws Error if `vec_imgs` is not specified.
+        #' @examples
+        #' \dontrun{
+        #'   obj <- CSample$new()
+        #'   obj$compute_variation()
+        #' }
         compute_variation = function() {
             if (self$vector_images |> is.null()) {
                 if (private$tangent_handler$tangent_images |> is.null()) {
@@ -270,7 +294,7 @@ CSample <- R6::R6Class( # nolint: cyclocomp_linter
                 self$center()
                 self$compute_vecs()
             }
-            private$var <- private$vec_imgs[[2]] |>
+            private$var <- private$vec_imgs |>
                 apply(X = _, MARGIN = 1, FUN = function(x) sum(x^2)) |>
                 mean()
         },
@@ -293,7 +317,7 @@ CSample <- R6::R6Class( # nolint: cyclocomp_linter
                 self$compute_vecs()
             }
 
-            private$s_cov <- cov(private$vec_imgs[[2]])
+            private$s_cov <- cov(private$vec_imgs)
         }
     ),
     active = list(
@@ -321,13 +345,16 @@ CSample <- R6::R6Class( # nolint: cyclocomp_linter
         #' @field frechet_mean Frechet mean
         frechet_mean = function() private$f_mean,
 
-        #' @field metric Riemannian Metric used
-        metric = function() private$metric,
+        #' @field riem_metric Riemannian Metric used
+        riem_metric = function() private$metric_obj,
 
         #' @field variation Variation of the sample
         variation = function() private$var,
 
         #' @field sample_cov Sample covariance
-        sample_cov = function() private$s_cov
+        sample_cov = function() private$s_cov,
+
+        #' @field ref_pt Reference point for tangent or vectorized images
+        ref_point = function() private$tangent_handler$ref_point
     )
 )

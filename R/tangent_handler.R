@@ -3,26 +3,26 @@
 #' This class handles tangent images on a manifold. It provides methods to set a reference point, compute tangents, and perform various operations using a provided metric. # nolint: line_length_linter.
 #'
 #' @field reference_point The current reference point on the manifold.
-#' @field tangent_images List of tangent images (dspMatrix objects).
-#' @field metric rmetric object for operations.
+#' @field tan_images List of tangent images (dspMatrix objects).
+#' @field metric_obj rmetric object for operations.
 TangentImageHandler <- R6::R6Class( # nolint: object_name_linter.
     classname = "TangentImageHandler",
     private = list(
         reference_point = NULL, # The current reference point on the manifold
-        tangent_images = NULL, # List of tangent images (dspMatrix objects)
-        metric = NULL # Metric object for operations
+        tan_images = NULL, # List of tangent images (dspMatrix objects)
+        metric_obj = NULL # Metric object for operations
     ),
     public = list(
         #' Initialize the TangentImageHandler
         #'
-        #' @param metric An rmetric object for operations.
+        #' @param metric_obj An rmetric object for operations.
         #' @param reference_point An optional reference point on the manifold.
         #' @return A new instance of TangentImageHandler.
-        initialize = function(metric, reference_point = NULL) {
-            if (is.null(metric)) stop("Metric object must be provided.")
-            private$metric <- metric
+        initialize = function(metric_obj, reference_point = NULL) {
+            if (is.null(metric_obj)) stop("Metric object must be provided.")
+            private$metric_obj <- metric_obj
             private$reference_point <- reference_point
-            private$tangent_images <- list()
+            private$tan_images <- list()
         },
 
         #' Set a new reference point.
@@ -36,12 +36,12 @@ TangentImageHandler <- R6::R6Class( # nolint: object_name_linter.
                 stop("Reference point must be of class dppMatrix.")
             }
             if (!is.null(private$reference_point) &&
-                !is.null(private$tangent_images)) { # nolint: indentation_linter, line_length_linter.
-                private$tangent_images <- private$tangent_images |>
+                !is.null(private$tan_images)) { # nolint: indentation_linter, line_length_linter.
+                private$tan_images <- private$tan_images |>
                     purrr::map(
-                        \(tan) private$metric$exp(private$reference_point, tan)
+                        \(tan) private$metric_obj$exp(private$reference_point, tan)
                     ) |>
-                    purrr::map(\(point) private$metric$log(new_ref_pt, point))
+                    purrr::map(\(point) private$metric_obj$log(new_ref_pt, point))
             }
             private$reference_point <- new_ref_pt
         },
@@ -54,9 +54,9 @@ TangentImageHandler <- R6::R6Class( # nolint: object_name_linter.
             if (is.null(private$reference_point)) {
                 stop("Reference point must be set before computing tangents.")
             }
-            private$tangent_images <- manifold_points |>
+            private$tan_images <- manifold_points |>
                 purrr::map(
-                    \(point) private$metric$log(private$reference_point, point)
+                    \(point) private$metric_obj$log(private$reference_point, point)
                 )
         },
 
@@ -64,10 +64,10 @@ TangentImageHandler <- R6::R6Class( # nolint: object_name_linter.
         #'
         #' @return A matrix, each row of which is a vectorization
         compute_vecs = function() {
-            self$tangent_images |>
-                purrr::map(\(tan) metric$vec(self$reference_point, tan)) |>
-                do.call(rbind, args = _) |>
-                (\(x) list(self$reference_point, x))()
+            x <- self$tangent_images
+            y <- purrr::map(x, \(tan) private$metric_obj$vec(private$reference_point, tan))
+            do.call(rbind, args = y) #|>
+            # (\(x) list(private$reference_point, x))()
         },
 
         #' Computes connectomes from tangent images
@@ -75,12 +75,12 @@ TangentImageHandler <- R6::R6Class( # nolint: object_name_linter.
         #' @throws Error if the tangent images have not been specified
         #' @return A list of connectomes
         compute_conns = function() {
-            if (is.null(private$tangent_images)) {
+            if (is.null(private$tan_images)) {
                 stop("tangent images must be specified.")
             }
-            private$tangent_images |>
+            private$tan_images |>
                 purrr::map(
-                    \(tan) private$metric$exp(private$reference_point, tan)
+                    \(tan) private$metric_obj$exp(private$reference_point, tan)
                 )
         },
         #' Setter for the tangent images
@@ -100,7 +100,7 @@ TangentImageHandler <- R6::R6Class( # nolint: object_name_linter.
                 stop("All tangent images must be of class dspMatrix.")
             }
             private$reference_point <- reference_point
-            private$tangent_images <- tangent_images
+            private$tan_images <- tangent_images
         },
 
         #' Appends a matrix to the list of tangent images
@@ -111,14 +111,14 @@ TangentImageHandler <- R6::R6Class( # nolint: object_name_linter.
             if (!inherits(image, "dspMatrix")) {
                 stop("Tangent image must be of class dspMatrix.")
             }
-            private$tangent_images <- c(private$tangent_images, list(image))
+            private$tan_images <- c(private$tan_images, list(image))
         },
 
         #' Tangent images getter
         #'
         #' @return list of tangent matrices
         get_tangent_images = function() {
-            private$tangent_images
+            private$tan_images
         },
 
         #' Wrapper for set_reference_point
@@ -130,11 +130,12 @@ TangentImageHandler <- R6::R6Class( # nolint: object_name_linter.
     ),
     active = list(
         #' @field reference_point A matrix of type dppMatrix
-        reference_point = function(value) {
-            if (missing(value)) {
-                return(private$reference_point)
-            }
-            self$set_reference_point(value)
+        ref_point = function() {
+            # if (missing(value)) {
+            #     return(private$reference_point)
+            # }
+            # self$set_reference_point(value)
+            private$reference_point
         },
 
         #' @field tangent_images A list of dspMatrix objects

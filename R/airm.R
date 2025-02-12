@@ -12,7 +12,7 @@
 #' airm_log(sigma, lambda)
 #' @export
 airm_log <- function(sigma, lambda) {
-    validate_log_args()
+    validate_log_args(sigma, lambda)
 
     sigma_sqrt <- expm::sqrtm(sigma) |>
         Matrix::nearPD() |>
@@ -44,7 +44,7 @@ airm_log <- function(sigma, lambda) {
 #' airm_exp(sigma, v)
 #' @export
 airm_exp <- function(sigma, v) {
-    validate_exp_args()
+    validate_exp_args(sigma, v)
 
     sigma_sqrt <- expm::sqrtm(sigma) |> Matrix::nearPD() |> _$mat
     sigma_sqrt_inv <- Matrix::solve(sigma_sqrt)
