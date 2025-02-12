@@ -1,19 +1,26 @@
 #' Compute the Log-Euclidean Logarithm
 #'
-#' @param ref_pt A reference point.
-#' @param mfd_pt A point on the manifold.
+#' @param sigma A reference point.
+#' @param lambda A point on the manifold.
 #'
-#' @return The tangent space image of `mfd_pt` at `ref_pt`.
+#' @return The tangent space image of `lambda` at `sigma`.
 #' @export
-log_euclidean_log <- function(ref_pt, mfd_pt) {
-    validate_log_args(ref_pt, mfd_pt)
+log_euclidean_log <- function(sigma, lambda) {
+    validate_log_args(sigma, lambda)
 
-    aux_matr_1 <- ref_pt |> safe_logm()
-    aux_matr_2 <- mfd_pt |> safe_logm()
+    aux_matr_1 <- sigma |> safe_logm()
+    aux_matr_2 <- lambda |> safe_logm()
 
-    aux_matr_3 <- aux_matr_1 - aux_matr_2
+    aux_matr_3 <- aux_matr_2 - aux_matr_1
 
-    dexp(ref_pt, aux_matr_3)
+    aux_matr_1 <- aux_matr_1 |>
+        methods::as("dsyMatrix") |>
+        Matrix::pack()
+    aux_matr_3 <- aux_matr_3 |>
+        methods::as("dsyMatrix") |>
+        Matrix::pack()
+
+    dexp(aux_matr_1, aux_matr_3)
 }
 
 #' Compute the Log-Euclidean Exponential
@@ -21,18 +28,18 @@ log_euclidean_log <- function(ref_pt, mfd_pt) {
 #' This function computes the Euclidean exponential map.
 #'
 #' @param ref_pt A reference point.
-#' @param tangent A tangent vector to be mapped back to the manifold at `ref_pt`. # nolint: line_length_linter
+#' @param v A tangent vector to be mapped back to the manifold at `ref_pt`. # nolint: line_length_linter
 #'
 #' @return The point on the manifold corresponding to the tangent vector at `ref_pt`. # nolint: line_length_linter
 #' @export
-log_euclidean_exp <- function(ref_pt, tangent) {
-    validate_exp_args(ref_pt, tangent)
+log_euclidean_exp <- function(ref_pt, v) {
+    validate_exp_args(ref_pt, v)
 
     # compute the functions that compose the exponential
     aux_matr_1 <- ref_pt |>
         as.matrix() |>
         expm::logm()
-    aux_matr_2 <- tangent |>
+    aux_matr_2 <- v |>
         (\(x) dlog(ref_pt, x))()
 
     aux_matr_3 <- aux_matr_1 + aux_matr_2

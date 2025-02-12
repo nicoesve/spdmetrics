@@ -371,18 +371,17 @@ dexp <- function(a, x) {
 
     result <- Matrix::Matrix(0, n, n, sparse = FALSE)
     for (t in t_vals) {
-        gamma_left <- (1 - t) * a |>
+        gamma_left <- ((1 - t) * a) |>
             as.matrix() |>
             expm::expm(method = "hybrid_Eigen_Ward")
-        gamma_right <- t * a |>
+        gamma_right <- (t * a) |>
             as.matrix() |>
             expm::expm(method = "hybrid_Eigen_Ward")
         result <- result + gamma_left %*% x %*% gamma_right * dt
     }
 
     result |>
-        Matrix::nearPD() |>
-        _$mat |>
+        methods::as("dsyMatrix") |>
         Matrix::pack()
 }
 
