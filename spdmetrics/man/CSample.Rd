@@ -17,6 +17,8 @@ conn_sample <- CSample$new(
 conns = list_of_conns,
 metric_obj = airm
 )
+Compute Tangent Images
+
 
 ## ------------------------------------------------
 ## Method `CSample$compute_tangents`
@@ -202,6 +204,8 @@ conn_sample <- CSample$new(
 conns = list_of_conns,
 metric_obj = airm
 )
+Compute Tangent Images
+
 }
 \if{html}{\out{</div>}}
 

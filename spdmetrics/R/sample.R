@@ -28,7 +28,6 @@ CSample <- R6::R6Class( # nolint: cyclocomp_linter
         #' conns = list_of_conns,
         #' metric_obj = airm
         #' )
-        #' @export
         initialize = function(conns = NULL, tan_imgs = NULL,
                               vec_imgs = NULL, centered = NULL,
                               ref_pt = NULL, metric_obj) {
