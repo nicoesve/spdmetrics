@@ -1,28 +1,33 @@
 #' Compute the Euclidean Logarithm
 #'
-#' @param ref_pt A reference point.
-#' @param mfd_pt A point on the manifold.
+#' @param sigma A reference point.
+#' @param lambda A point on the manifold.
 #'
-#' @return The tangent space image of `mfd_pt` at `ref_pt`.
+#' @return The tangent space image of `lambda` at `sigma`.
 #' @export
-euclidean_log <- function(ref_pt, mfd_pt) {
-    validate_log_args(ref_pt, mfd_pt)
-    ref_pt - mfd_pt
+euclidean_log <- function(sigma, lambda) {
+    validate_log_args(sigma, lambda)
+    (lambda - sigma) |>
+        Matrix::symmpart() |>
+        Matrix::pack()
 }
 
 #' Compute the Euclidean Exponential
 #'
-#' @param ref_pt A reference point.
-#' @param tangent A tangent vector to be mapped back to the manifold at `ref_pt`. # nolint: line_length_linter
+#' @param sigma A reference point.
+#' @param v A tangent vector to be mapped back to the manifold at `sigma`. # nolint: line_length_linter
 #'
-#' @return The point on the manifold corresponding to the tangent vector at `ref_pt`. # nolint: line_length_linter
+#' @return The point on the manifold corresponding to the tangent vector at `sigma`. # nolint: line_length_linter
 #' @export
-euclidean_exp <- function(ref_pt, tangent) {
-    validate_exp_args(ref_pt, tangent)
+euclidean_exp <- function(sigma, v) {
+    validate_exp_args(sigma, v)
     tryCatch(
         {
-            chol(ref_pt + tangent)
-            ref_pt + tangent
+            chol(sigma + v)
+            (sigma + v) |>
+                Matrix::nearPD() |>
+                _$mat |>
+                Matrix::pack()
         },
         error = function(e) {
             stop("Exponential map is not defined for those arguments")

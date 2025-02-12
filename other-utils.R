@@ -381,7 +381,7 @@ dexp <- function(a, x) {
     }
 
     result |>
-        methods::as("dsyMatrix") |>
+        Matrix::symmpart() |>
         Matrix::pack()
 }
 
