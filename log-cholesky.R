@@ -62,7 +62,18 @@ log_cholesky_exp <- function(ref_pt, tangent) {
     # Transform tangent vector to Cholesky space
     l_inv <- solve(l_ref)
     temp <- l_inv %*% tangent %*% t(l_inv)
-    temp_sqrt <- expm::sqrtm(Matrix::symmpart(temp))
+    # temp_sqrt <- expm::sqrtm(Matrix::symmpart(temp))
+    temp_sqrt <- temp |>
+        Matrix::nearPD() |>
+        _$mat |>
+        as.matrix() |>
+        expm::sqrtm() |>
+        Matrix::symmpart() |>
+        Matrix::pack()
+    # temp_sqrt <- temp_sqrt |>
+    #     Matrix::nearPD() |>
+    #     _$mat |>
+    #     Matrix::pack()
 
     # Compute new Cholesky factor
     x_l <- l_ref %*% temp_sqrt
