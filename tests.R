@@ -125,7 +125,7 @@ test_metric <- function(metric_obj, metric_name) {
         # Test vectorization
         sample$compute_vecs()
         expect_false(is.null(sample$vector_images))
-        expect_true(is.matrix(sample$vector_images[[2]]))
+        expect_true(is.matrix(sample$vector_images))
 
         # Test statistical operations
         sample$compute_fmean()

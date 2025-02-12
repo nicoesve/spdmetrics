@@ -32,7 +32,10 @@ rspdnorm <- function(n, refpt, disp, met) {
     mu <- rep(0, d)
     Sigma <- as.matrix(disp)
     smat <- MASS::mvrnorm(n, mu, Sigma)
-    CSample$new(vec_imgs = list(refpt, smat), met = met, centered = FALSE)
+    CSample$new(
+        vec_imgs = smat, metric_obj = met, centered = FALSE,
+        ref_pt = refpt
+    )
 }
 
 #' Relocate Tangent Representations to a New Reference Point
@@ -48,7 +51,7 @@ rspdnorm <- function(n, refpt, disp, met) {
 #' @export
 relocate <- function(old_ref, new_ref, images, met) {
     images |> furrr::future_map(
-        \(tan) met$exp(old_ref, tan) |> met$log(Sigma = new_ref, Lambda = _)
+        \(tan) met$exp(old_ref, tan) |> met$log(sigma = new_ref, lambda = _)
     )
 }
 
@@ -61,7 +64,7 @@ relocate <- function(old_ref, new_ref, images, met) {
 #' @param max_iter An integer specifying the maximum number of iterations. Default is 20.# nolint: line_length_linter.
 #' @param lr A numeric value specifying the learning rate. Default is 0.2.
 #'
-#' @return The function updates the `frechet_mean` field of the `sample` object with the computed Frechet mean.# nolint: line_length_linter.
+#' @return The computed Frechet mean.
 #'
 #' @details
 #' The function iteratively updates the reference point of the sample until the change in the reference point is less than the specified tolerance or the maximum number of iterations is reached. If the tangent images are not already computed, they will be computed before starting the iterations.# nolint: line_length_linter.
@@ -91,9 +94,9 @@ compute_frechet_mean <- function(sample, tol = 0.05, max_iter = 20, lr = 0.2) {
     iter <- 0
 
     while ((delta > tol) && (iter < max_iter)) {
-        old_tan <- sample$tangent_images
+        old_tan <- aux_sample$tangent_images
         iter <- iter + 1
-        old_ref_pt <- sample$tangent_handler$reference_point
+        old_ref_pt <- aux_sample$ref_point
 
         if (iter > max_iter) {
             warning("Computation of Frechet mean exceeded maximum
@@ -103,7 +106,10 @@ compute_frechet_mean <- function(sample, tol = 0.05, max_iter = 20, lr = 0.2) {
         # Computing the step
         tan_step <- lr * Reduce(`+`, old_tan) /
             aux_sample$sample_size
-        new_ref_pt <- sample$metric$exp(old_ref_pt, tan_step)
+        tan_step <- tan_step |>
+            methods::as("dsyMatrix") |>
+            Matrix::pack()
+        new_ref_pt <- aux_sample$riem_metric$exp(old_ref_pt, tan_step)
 
         delta <- Matrix::norm(new_ref_pt - old_ref_pt, "F") /
             Matrix::norm(old_ref_pt, "F")
@@ -111,15 +117,16 @@ compute_frechet_mean <- function(sample, tol = 0.05, max_iter = 20, lr = 0.2) {
         # Mapping tangent images to the new step
         new_tan_imgs <- relocate(
             old_ref_pt, new_ref_pt, old_tan,
-            sample$metric
+            sample$riem_metric
         )
 
         aux_sample <- CSample$new(
-            tan_imgs = list(new_ref_pt, new_tan_imgs),
-            centered = FALSE, metric = sample$metric
+            tan_imgs = new_tan_imgs,
+            ref_pt = new_ref_pt,
+            centered = FALSE, metric_obj = sample$riem_metric
         )
     }
-    sample$frechet_mean <- sample$tangent_handler$reference_point
+    aux_sample$ref_point
 }
 
 #' Validate Metric
@@ -138,7 +145,7 @@ validate_metric <- function(metric) {
 #'
 #' @param conns List of connection matrices.
 #' @param tan_imgs List of tangent images.
-#' @param vec_imgs List of vector images.
+#' @param vec_imgs Matrix of vector images.
 #' @param centered Logical indicating if the data is centered.
 #' @return None. Throws an error if the validation fails.
 validate_conns <- function(conns, tan_imgs, vec_imgs, centered) {
@@ -173,13 +180,13 @@ validate_tan_imgs <- function(tan_imgs, vec_imgs, centered) {
             stop("If tan_imgs is not NULL, centered must be specified.")
         }
         if (!is.logical(centered)) stop("centered must be a logical.")
-        if (!inherits(tan_imgs[[1]], "dppMatrix")) {
-            stop("The first element of tan_imgs must be a dppMatrix object.")
-        }
-        if (!is.list(tan_imgs[[2]])) {
+        # if (!inherits(tan_imgs[[1]], "dppMatrix")) {
+        #     stop("The first element of tan_imgs must be a dppMatrix object.")
+        # }
+        if (!is.list(tan_imgs)) {
             stop("The second element of tan_imgs must be a list.")
         }
-        class_flag <- tan_imgs[[2]] |>
+        class_flag <- tan_imgs |>
             purrr::map_lgl(\(x) inherits(x, "dspMatrix")) |>
             all()
         if (!class_flag) {
@@ -203,10 +210,10 @@ validate_vec_imgs <- function(vec_imgs, centered) {
         stop("If vec_imgs is not NULL, centered must be specified.")
     }
     if (!is.logical(centered)) stop("centered must be a logical.")
-    if (!inherits(vec_imgs[[1]], "dppMatrix")) {
-        stop("The first element of vec_imgs must be a dppMatrix object.")
-    }
-    if (!is.matrix(vec_imgs[[2]])) {
+    # if (!inherits(vec_imgs[[1]], "dppMatrix")) {
+    #     stop("The first element of vec_imgs must be a dppMatrix object.")
+    # }
+    if (!is.matrix(vec_imgs)) {
         stop("The second element of vec_imgs must be a matrix.")
     }
 }
