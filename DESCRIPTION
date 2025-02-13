@@ -34,6 +34,6 @@ Suggests:
     knitr,
     rmarkdown
 VignetteBuilder: knitr
-URL: https://nicoesve.github.io/latexSymb/
-BugReports: https://github.com/nicoesve/latexSymb/issues
+URL: https://nicoesve.github.io/spdmetrics/
+BugReports: https://github.com/nicoesve/spdmetrics/issues
 Config/testthat/edition: 3
