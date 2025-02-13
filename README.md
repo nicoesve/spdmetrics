@@ -73,9 +73,9 @@ sample$sample_cov
 ## Documentation
 For more detailed information, check out:
 
-* [Package website](https://yourusername.github.io/spdmetrics/)
-* [Function reference](https://yourusername.github.io/spdmetrics/reference/)
-* [Introduction to spdmetrics](https://yourusername.github.io/spdmetrics/articles/spdmetrics.html)
+* [Package website](https://nicoesve.github.io/spdmetrics/)
+* [Function reference](https://nicoesve.github.io/spdmetrics/reference/)
+* [Introduction to spdmetrics](https://nicoesve.github.io/spdmetrics/articles/spdmetrics.html)
 
 ## Contributing
 Contributions are welcome! Please feel free to submit a Pull Request.
