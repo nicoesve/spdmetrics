@@ -1,7 +1,7 @@
 # spdmetrics: Riemannian Metrics for Symmetric Positive Definite Matrices
 
 <!-- badges: start -->
-[![R-CMD-check](https://github.com/yourusername/spdmetrics/workflows/R-CMD-check/badge.svg)](https://github.com/nicoesve/spdmetrics/actions)
+<!--[![R-CMD-check](https://github.com/yourusername/spdmetrics/workflows/R-CMD-check/badge.svg)](https://github.com/nicoesve/spdmetrics/actions)-->
 <!-- badges: end -->
 
 ## Overview
@@ -17,10 +17,9 @@ The package implements five different metrics:
 
 ## Installation
 
-You can install the released version of spdmetrics from CRAN with:
+You can install the released version of spdmetrics with:
 
 ```r
-install.packages("spdmetrics")
 # install.packages("devtools")
 devtools::install_github("yourusername/spdmetrics")
 ```
