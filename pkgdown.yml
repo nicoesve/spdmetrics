@@ -3,7 +3,7 @@ pkgdown: 2.1.1
 pkgdown_sha: ~
 articles:
   spdmetrics: spdmetrics.html
-last_built: 2025-02-13T01:17Z
+last_built: 2025-02-13T01:19Z
 urls:
   reference: https://nicoesve.github.io/spdmetrics/reference
   article: https://nicoesve.github.io/spdmetrics/articles
