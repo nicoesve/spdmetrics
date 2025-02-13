@@ -21,7 +21,7 @@ You can install the released version of spdmetrics with:
 
 ```r
 # install.packages("devtools")
-devtools::install_github("yourusername/spdmetrics")
+devtools::install_github("nicoesve/spdmetrics")
 ```
 
 ## Usage
