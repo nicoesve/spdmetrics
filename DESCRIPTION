@@ -35,3 +35,5 @@ Suggests:
     rmarkdown
 VignetteBuilder: knitr
 Config/testthat/edition: 3
+URL: https://nicoesve.github.io/spdmetrics/
+BugReports: https://github.com/nicoesve/spdmetrics/issues
