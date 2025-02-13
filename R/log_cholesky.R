@@ -58,9 +58,9 @@ log_cholesky_exp <- function(sigma, v) {
     x_l <- Matrix::tril(x_l)
 
     # Compute off-diagonal difference and diagonal terms
-    lower_sum <- x_l + l_ref
-    diag_ratio <- diag(x_l) / diag(l_ref)
-    diag_terms <- diag(l_ref) * exp(diag_ratio)
+    lower_sum <- (x_l + l_ref) |> as.matrix()
+    diag_ratio <- diag(x_l |> as.matrix()) / diag(l_ref |> as.matrix())
+    diag_terms <- diag(l_ref |> as.matrix()) * exp(diag_ratio |> as.matrix())
 
     # Set diagonal terms
     diag(lower_sum) <- diag_terms
@@ -85,15 +85,15 @@ spd_isometry_to_identity <- function(sigma, v) {
     l_ref <- sigma |>
         chol() |>
         t()
-    lchol_inv <- l_ref |> (\(x) (1 / diag(x)) - Matrix::tril(x, -1))()
+    lchol_inv <- l_ref |> (\(x) (1 / diag(x |> as.matrix())) - Matrix::tril(x, -1))()
 
     l_inv <- solve(l_ref)
     temp <- l_inv %*% v %*% t(l_inv)
     temp_under_half <- temp |> half_underscore()
     x_l <- l_ref %*% temp_under_half
 
-    tan_version <- Matrix::tril(x_l, -1)
-    diag(tan_version) <- diag(lchol_inv) * diag(x_l)
+    tan_version <- Matrix::tril(x_l, -1) |> as.matrix()
+    diag(tan_version) <- diag(lchol_inv |> as.matrix()) * diag(x_l |> as.matrix())
 
     (2 * tan_version) |>
         Matrix::symmpart() |>
@@ -129,8 +129,8 @@ spd_isometry_from_identity <- function(sigma, v) {
         t()
 
     x_l <- half_underscore(v)
-    tan_version <- Matrix::tril(x_l, -1)
-    diag(tan_version) <- diag(l_ref) * diag(x_l)
+    tan_version <- Matrix::tril(x_l, -1) |> as.matrix()
+    diag(tan_version) <- diag(l_ref |> as.matrix()) * diag(x_l |> as.matrix())
 
     aux <- l_ref %*% t(tan_version) + tan_version %*% t(l_ref)
     aux |>

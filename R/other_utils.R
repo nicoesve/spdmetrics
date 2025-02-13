@@ -222,7 +222,7 @@ validate_vec_imgs <- function(vec_imgs, centered) {
 #'
 #' @param sigma A dppMatrix object
 #' @param lambda A dppMatrix object
-#' @throws Error if sigma and lambda are not of the same dimensions
+#' @details Error if sigma and lambda are not of the same dimensions
 #' @return None
 validate_log_args <- function(sigma, lambda) {
     inheritance_flag <- list(sigma, lambda) |>
@@ -246,8 +246,8 @@ validate_log_args <- function(sigma, lambda) {
 #' Validate arguments for Riemannian logarithms
 #'
 #' @param sigma A dppMatrix object
-#' @param lambda A dspMatrix object
-#' @throws Error if sigma and lambda are not of the same dimensions
+#' @param v A dspMatrix object
+#' @details Error if sigma and lambda are not of the same dimensions
 #' @return None
 validate_exp_args <- function(sigma, v) {
     inheritance_flag <- c(
@@ -274,7 +274,7 @@ validate_exp_args <- function(sigma, v) {
 #'
 #' @param sigma A dppMatrix object
 #' @param v A dspMatrix object
-#' @throws Error if sigma and v are not of the same dimensions
+#' @details Error if sigma and v are not of the same dimensions
 #' @return None
 validate_vec_args <- function(sigma, v) {
     validate_exp_args(sigma, v)
@@ -284,7 +284,7 @@ validate_vec_args <- function(sigma, v) {
 #'
 #' @param sigma A dppMatrix object
 #' @param w A numeric vector
-#' @throws Error if the dimensionalities don't match
+#' @details Error if the dimensionalities don't match
 #' @return None
 validate_unvec_args <- function(sigma, w) {
     inheritance_flag <- c(
@@ -323,7 +323,7 @@ id_matr <- function(sigma) {
 #' Computes the differential of the matrix logarithm map at a point Sigma, evaluated at H # nolint: line_length_linter
 #'
 #' @param sigma A symmetric positive definite matrix of class dspMatrix
-#' @param H A symmetric matrix representing tangent vector of class dsyMatrix
+#' @param h A symmetric matrix representing tangent vector of class dsyMatrix
 #' @return A symmetric matrix representing the differential evaluated at H of class dsyMatrix # nolint: line_length_linter
 #' @export
 dlog <- function(sigma, h) {

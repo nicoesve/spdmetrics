@@ -1,10 +1,6 @@
 #' TangentImageHandler Class
 #'
 #' This class handles tangent images on a manifold. It provides methods to set a reference point, compute tangents, and perform various operations using a provided metric. # nolint: line_length_linter.
-#'
-#' @field reference_point The current reference point on the manifold.
-#' @field tan_images List of tangent images (dspMatrix objects).
-#' @field metric_obj rmetric object for operations.
 TangentImageHandler <- R6::R6Class( # nolint: object_name_linter.
     classname = "TangentImageHandler",
     private = list(
@@ -48,7 +44,7 @@ TangentImageHandler <- R6::R6Class( # nolint: object_name_linter.
 
         #' Computes the tangent images from the points in the manifold
         #'
-        #' @param manifold points A list of connectomes
+        #' @param manifold_points A list of connectomes
         #' @return None
         compute_tangents = function(manifold_points) {
             if (is.null(private$reference_point)) {
@@ -72,7 +68,7 @@ TangentImageHandler <- R6::R6Class( # nolint: object_name_linter.
 
         #' Computes connectomes from tangent images
         #'
-        #' @throws Error if the tangent images have not been specified
+        #' @details Error if the tangent images have not been specified
         #' @return A list of connectomes
         compute_conns = function() {
             if (is.null(private$tan_images)) {
@@ -87,7 +83,7 @@ TangentImageHandler <- R6::R6Class( # nolint: object_name_linter.
         #'
         #' @param reference_point A connectome
         #' @param tangent_images A list of tangent images
-        #' @throws Error if the reference point is not an object of class dppMatrix # nolint: line_length_linter
+        #' @details Error if the reference point is not an object of class dppMatrix # nolint: line_length_linter
         #' @return None
         set_tangent_images = function(reference_point, tangent_images) {
             if (!inherits(reference_point, "dppMatrix")) {
@@ -106,7 +102,7 @@ TangentImageHandler <- R6::R6Class( # nolint: object_name_linter.
         #' Appends a matrix to the list of tangent images
         #'
         #' @param image Matrix to be added
-        #' @throws Error if the matrix is not of type dspMatrix
+        #' @details Error if the matrix is not of type dspMatrix
         add_tangent_image = function(image) {
             if (!inherits(image, "dspMatrix")) {
                 stop("Tangent image must be of class dspMatrix.")
@@ -123,13 +119,14 @@ TangentImageHandler <- R6::R6Class( # nolint: object_name_linter.
 
         #' Wrapper for set_reference_point
         #'
+        #' @param new_ref_pt The new reference point
         #' @return None
         relocate_tangents = function(new_ref_pt) {
             self$set_reference_point(new_ref_pt)
         }
     ),
     active = list(
-        #' @field reference_point A matrix of type dppMatrix
+        #' @field ref_point A matrix of type dppMatrix
         ref_point = function() {
             # if (missing(value)) {
             #     return(private$reference_point)

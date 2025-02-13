@@ -14,10 +14,10 @@ log_euclidean_log <- function(sigma, lambda) {
     aux_matr_3 <- aux_matr_2 - aux_matr_1
 
     aux_matr_1 <- aux_matr_1 |>
-        methods::as("dsyMatrix") |>
+        Matrix::symmpart() |>
         Matrix::pack()
     aux_matr_3 <- aux_matr_3 |>
-        methods::as("dsyMatrix") |>
+        Matrix::symmpart() |>
         Matrix::pack()
 
     dexp(aux_matr_1, aux_matr_3)

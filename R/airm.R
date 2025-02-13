@@ -7,9 +7,11 @@
 #'
 #' @return A symmetric matrix of class `dspMatrix`, representing the tangent space image of `lambda` at `sigma`. # nolint: line_length_linter
 #' @examples
+#' \dontrun{
 #' sigma <- diag(2) |> Matrix::nearPD()$mat |> Matrix::pack()
 #' lambda <- diag(c(2, 3)) |> Matrix::nearPD()$mat |> Matrix::pack()
 #' airm_log(sigma, lambda)
+#' }
 #' @export
 airm_log <- function(sigma, lambda) {
     validate_log_args(sigma, lambda)
@@ -39,9 +41,11 @@ airm_log <- function(sigma, lambda) {
 #'
 #' @return A symmetric positive-definite matrix of class `dppMatrix`.
 #' @examples
+#' \dontrun{
 #' sigma <- diag(2) |> Matrix::nearPD()$mat |> Matrix::pack()
 #' v <- diag(c(1, 0.5)) |> Matrix::nearPD()$mat |> Matrix::pack()
 #' airm_exp(sigma, v)
+#' }
 #' @export
 airm_exp <- function(sigma, v) {
     validate_exp_args(sigma, v)
@@ -66,8 +70,10 @@ airm_exp <- function(sigma, v) {
 #'
 #' @return A numeric vector, representing the vectorized tangent image.
 #' @examples
+#' \dontrun{
 #' v <- diag(c(1, sqrt(2))) |> Matrix::nearPD()$mat |> Matrix::pack()
 #' vec_at_id(v)
+#' }
 #' @export
 vec_at_id <- function(v) {
     if (!inherits(v, "dspMatrix")) {
@@ -96,9 +102,11 @@ vec_at_id <- function(v) {
 #'
 #' @return A numeric vector, representing the vectorized tangent image.
 #' @examples
+#' \dontrun{
 #' sigma <- diag(2) |> Matrix::nearPD()$mat |> Matrix::pack()
 #' v <- diag(c(1, 0.5)) |> Matrix::nearPD()$mat |> Matrix::pack()
 #' airm_vec(sigma, v)
+#' }
 #' @export
 airm_vec <- function(sigma, v) {
     validate_vec_args(sigma, v)
@@ -123,9 +131,11 @@ airm_vec <- function(sigma, v) {
 #'
 #' @return A symmetric matrix of class `dspMatrix`, representing the tangent vector. # nolint: line_length_linter
 #' @examples
+#' \dontrun{
 #' sigma <- diag(2) |> Matrix::nearPD()$mat |> Matrix::pack()
 #' w <- c(1, sqrt(2), 2)
 #' airm_unvec(sigma, w)
+#' }
 #' @export
 airm_unvec <- function(sigma, w) {
     validate_unvec_args(sigma, w)
