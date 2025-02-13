@@ -1,7 +1,7 @@
 # spdmetrics: Riemannian Metrics for Symmetric Positive Definite Matrices
 
 <!-- badges: start -->
-[![R-CMD-check](https://github.com/yourusername/spdmetrics/workflows/R-CMD-check/badge.svg)](https://github.com/nicoesve/spdmetrics/actions)
+<!-- [![R-CMD-check](https://github.com/yourusername/spdmetrics/workflows/R-CMD-check/badge.svg)](https://github.com/nicoesve/spdmetrics/actions) -->
 <!-- badges: end -->
 
 ## Overview
