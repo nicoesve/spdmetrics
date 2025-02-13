@@ -1,7 +1,7 @@
 # spdmetrics: Riemannian Metrics for Symmetric Positive Definite Matrices
 
 <!-- badges: start -->
-<!--[![R-CMD-check](https://github.com/yourusername/spdmetrics/workflows/R-CMD-check/badge.svg)](https://github.com/nicoesve/spdmetrics/actions)-->
+<!-- [![R-CMD-check](https://github.com/yourusername/spdmetrics/workflows/R-CMD-check/badge.svg)](https://github.com/nicoesve/spdmetrics/actions) -->
 <!-- badges: end -->
 
 ## Overview
@@ -21,7 +21,7 @@ You can install the released version of spdmetrics with:
 
 ```r
 # install.packages("devtools")
-devtools::install_github("yourusername/spdmetrics")
+devtools::install_github("nicoesve/spdmetrics")
 ```
 
 ## Usage
@@ -73,9 +73,9 @@ sample$sample_cov
 ## Documentation
 For more detailed information, check out:
 
-* [Package website](https://yourusername.github.io/spdmetrics/)
-* [Function reference](https://yourusername.github.io/spdmetrics/reference/)
-* [Introduction to spdmetrics](https://yourusername.github.io/spdmetrics/articles/spdmetrics.html)
+* [Package website](https://nicoesve.github.io/spdmetrics/)
+* [Function reference](https://nicoesve.github.io/spdmetrics/reference/)
+* [Introduction to spdmetrics](https://nicoesve.github.io/spdmetrics/articles/spdmetrics.html)
 
 ## Contributing
 Contributions are welcome! Please feel free to submit a Pull Request.
